@@ -311,19 +311,83 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .sync-dot.loading{background:var(--warn);animation:pulse .8s ease-in-out infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
+/* ═══ DRAWER (SP) ═══ */
+.drawer-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0);
+  z-index:200;transition:background .25s;
+}
+.drawer-overlay.open{background:rgba(0,0,0,0.35);}
+.drawer{
+  position:fixed;top:0;left:0;bottom:0;width:280px;
+  background:var(--bg2);box-shadow:4px 0 24px rgba(0,0,0,0.12);
+  transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);
+  z-index:201;overflow-y:auto;display:flex;flex-direction:column;
+}
+.drawer.open{transform:translateX(0);}
+.drawer-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 16px 14px;border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.drawer-title{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;color:var(--text);}
+.drawer-close{
+  background:none;border:none;font-size:22px;color:var(--text3);
+  cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1;
+}
+.drawer-close:hover{background:var(--bg3);color:var(--text);}
+.drawer-body{flex:1;padding:12px 0;}
+.drawer-section{margin-bottom:8px;}
+.drawer-label{
+  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
+  color:var(--text3);text-transform:uppercase;
+  padding:8px 16px 6px;
+}
+.drawer-item{
+  display:flex;align-items:center;gap:10px;
+  padding:11px 16px;cursor:pointer;border-left:3px solid transparent;
+  font-size:14px;color:var(--text2);transition:all .1s;user-select:none;
+  border-bottom:none;
+}
+.drawer-item:hover{background:var(--bg3);color:var(--text);}
+.drawer-item.active{background:var(--bg3);color:var(--text);font-weight:500;}
+.drawer-count{
+  margin-left:auto;font-family:var(--mono);font-size:11px;
+  color:var(--text3);background:var(--bg4);padding:2px 8px;border-radius:10px;
+}
+.drawer-tag-cloud{padding:4px 12px 8px;display:flex;flex-wrap:wrap;gap:6px;}
+.drawer-footer{
+  flex-shrink:0;padding:12px 16px;border-top:1px solid var(--border);
+  display:flex;flex-direction:column;gap:8px;
+}
+.drawer-sync-btn{
+  width:100%;background:var(--bg3);border:1px solid var(--border);
+  color:var(--text2);font-family:var(--mono);font-size:12px;
+  padding:10px;border-radius:var(--r);cursor:pointer;transition:all .1s;
+}
+.drawer-sync-btn:hover{background:var(--bg4);color:var(--text);}
+.hamburger{
+  display:none;flex-shrink:0;
+  background:none;border:1px solid var(--border);
+  color:var(--text2);padding:7px 10px;border-radius:var(--r);
+  cursor:pointer;font-size:16px;line-height:1;transition:all .1s;
+}
+.hamburger:hover{background:var(--bg3);color:var(--text);}
+
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:640px){
   .sidebar{display:none;}
-  .bottom-nav{display:flex;}
-  .main{padding-bottom:0;}
-  .toast{bottom:70px;}
+  .bottom-nav{display:none;}
+  .hamburger{display:flex;align-items:center;}
+  .drawer-overlay{display:block;}
   .header-btn:not(.primary):not(.sp-show){display:none;}
   .form-row-2{grid-template-columns:1fr;}
   .card-actions .ic-btn:not(.copy-btn){display:none;}
   .cards{padding:10px 12px;}
+  .toast{bottom:24px;}
 }
 @media(min-width:641px){
   .bottom-nav{display:none;}
+  .drawer-overlay{display:none !important;}
   .overlay{align-items:center;}
   .modal{border-radius:16px;margin:16px;box-shadow:var(--shadow-md);}
   .modal-bar{display:none;}
@@ -338,6 +402,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
   <!-- HEADER -->
   <div class="header">
+    <button class="hamburger" onclick="openDrawer()" aria-label="メニュー">☰</button>
     <div class="logo">PM<em>/</em>AI</div>
     <div class="search-wrap">
       <span class="search-icon">⌕</span>
@@ -390,9 +455,36 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
     </div>
   </div>
 
-  <!-- BOTTOM NAV (SP) -->
-  <div class="bottom-nav">
-    <div class="bnav-items" id="bottomNavItems"></div>
+</div>
+
+<!-- DRAWER OVERLAY & DRAWER (SP) -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <span class="drawer-title">PM<em style="color:var(--border2);font-style:normal">/</em>AI</span>
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-section">
+      <div class="drawer-label">モデル</div>
+      <div id="drawerModels"></div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-label">タグ</div>
+      <div class="drawer-tag-cloud" id="drawerTagCloud"></div>
+    </div>
+    <div class="drawer-section">
+      <div class="drawer-label">絞り込み</div>
+      <div class="drawer-item" id="drawerStarFilter" onclick="toggleStarDrawer()">
+        <span style="font-size:16px;color:var(--warn)">★</span>
+        お気に入りのみ
+        <span id="drawerStarBadge" style="display:none;margin-left:auto;font-size:10px;background:var(--warn);color:#fff;padding:1px 7px;border-radius:8px;font-family:var(--mono)">ON</span>
+      </div>
+    </div>
+  </div>
+  <div class="drawer-footer">
+    <button class="drawer-sync-btn" onclick="syncFromSheets();closeDrawer()">↻ Sheetsと同期</button>
+    <button class="drawer-sync-btn" onclick="openSetup();closeDrawer()">⚙ 設定</button>
   </div>
 </div>
 
@@ -722,12 +814,18 @@ async function fetchPageTitle(){
 // ═══════════════════════════════════════════════════════
 function selModel(m){
   activeModel=m;
+  closeDrawer();
   renderCards();
 }
 function toggleStar(el){
   starOnly=!starOnly;
   el.classList.toggle('active',starOnly);
   renderCards();
+}
+function toggleStarDrawer(){
+  starOnly=!starOnly;
+  renderCards();
+  closeDrawer();
 }
 function filterTag(t){
   activeTag=activeTag===t?null:t;
@@ -756,28 +854,45 @@ function getFiltered(){
 
 function renderModelUI(){
   const sidebar = document.getElementById('sidebarModels');
-  const bnav = document.getElementById('bottomNavItems');
+  const drawer = document.getElementById('drawerModels');
+  const drawerTags = document.getElementById('drawerTagCloud');
   const fModel = document.getElementById('fModel');
   const models = allModels();
 
-  // サイドバー
-  sidebar.innerHTML =
-    `<div class="sb-item${activeModel==='all'?' active':''}" data-model="all" onclick="selModel('all')"><div class="dot dot-all"></div>すべて<span class="sb-count">${prompts.length}</span></div>` +
+  const modelItemsHTML = (cls, itemCls) =>
+    `<div class="${itemCls}${activeModel==='all'?' active':''}" data-model="all" onclick="selModel('all')" style="${activeModel==='all'?'border-left-color:var(--text2)':''}">
+      <div class="dot dot-all"></div>すべて<span class="${cls}-count">${prompts.length}</span></div>` +
     models.map(m=>{
       const cnt = prompts.filter(p=>p.model===m.id).length;
-      return `<div class="sb-item${activeModel===m.id?' active':''}" data-model="${m.id}" onclick="selModel('${m.id}')" style="${activeModel===m.id?'border-left-color:'+m.color+';color:'+m.color:''}">
-        <div class="dot" style="background:${m.color}"></div>${esc(m.label)}<span class="sb-count">${cnt}</span></div>`;
+      const isActive = activeModel===m.id;
+      return `<div class="${itemCls}${isActive?' active':''}" data-model="${m.id}" onclick="selModel('${m.id}')" style="${isActive?'border-left-color:'+m.color+';color:'+m.color:''}">
+        <div class="dot" style="background:${m.color}"></div>${esc(m.label)}<span class="${cls}-count">${cnt}</span></div>`;
     }).join('') +
-    `<div class="sb-item" onclick="openAddModel()" style="color:var(--text3);font-size:12px;"><div class="dot" style="background:var(--text3);border:1px dashed var(--text3);background:none"></div>＋ モデルを追加</div>`;
+    `<div class="${itemCls}" onclick="openAddModel()" style="color:var(--text3);font-size:12px;">
+      <div class="dot" style="border:1.5px dashed var(--text3);border-radius:50%;"></div>＋ モデルを追加</div>`;
 
-  // ボトムナビ（先頭4件＋追加ボタン）
-  const navModels = [{id:'all',label:'すべて',color:'var(--text2)'},...models].slice(0,4);
-  bnav.innerHTML = navModels.map(m=>{
-    const cnt = m.id==='all'?prompts.length:prompts.filter(p=>p.model===m.id).length;
-    return `<button class="bnav-item${activeModel===m.id?' active':''}" data-model="${m.id}" onclick="selModel('${m.id}')" style="${activeModel===m.id&&m.id!=='all'?'color:'+m.color:''}">
-      <div class="bnav-dot" style="background:${m.id==='all'?'var(--text3)':m.color}"></div>${esc(m.label)}<span class="bnav-badge">${cnt}</span></button>`;
-  }).join('') +
-  `<button class="bnav-item" onclick="openAdd()" style="color:var(--text2)"><span style="font-size:20px;line-height:1">＋</span>追加</button>`;
+  // サイドバー（PC）
+  if(sidebar){
+    sidebar.innerHTML = modelItemsHTML('sb','sb-item');
+  }
+
+  // ドロワー（SP）
+  if(drawer){
+    drawer.innerHTML = modelItemsHTML('drawer','drawer-item');
+    // ドロワー内タグクラウド更新
+    const freq={};
+    prompts.forEach(p=>(p.tags||[]).forEach(t=>{freq[t]=(freq[t]||0)+1;}));
+    if(drawerTags){
+      drawerTags.innerHTML = Object.entries(freq).sort((a,b)=>b[1]-a[1]).map(([t])=>
+        `<button class="tag-chip${activeTag===t?' active':''}" onclick="filterTag('${esc(t)}');closeDrawer()">#${esc(t)}</button>`
+      ).join('') || '<span style="font-size:12px;color:var(--text3);padding:0 4px">タグなし</span>';
+    }
+    // お気に入りフィルターの状態反映
+    const sf = document.getElementById('drawerStarFilter');
+    const sb = document.getElementById('drawerStarBadge');
+    if(sf) sf.style.background = starOnly?'var(--bg3)':'';
+    if(sb) sb.style.display = starOnly?'inline':'none';
+  }
 
   // フォームのselect
   if(fModel){
@@ -790,10 +905,11 @@ function renderModelUI(){
 function updateTags(){
   const freq={};
   prompts.forEach(p=>(p.tags||[]).forEach(t=>{freq[t]=(freq[t]||0)+1;}));
-  document.getElementById('tagCloud').innerHTML=
-    Object.entries(freq).sort((a,b)=>b[1]-a[1]).map(([t])=>
-      `<button class="tag-chip${activeTag===t?' active':''}" onclick="filterTag('${esc(t)}')">#${esc(t)}</button>`
-    ).join('');
+  const html = Object.entries(freq).sort((a,b)=>b[1]-a[1]).map(([t])=>
+    `<button class="tag-chip${activeTag===t?' active':''}" onclick="filterTag('${esc(t)}')">#${esc(t)}</button>`
+  ).join('');
+  const tc = document.getElementById('tagCloud');
+  if(tc) tc.innerHTML = html;
 }
 
 function renderCards(){
@@ -1031,6 +1147,19 @@ function saveCustomModel(){
   renderModelUI();
   toast(label+' を追加しました');
 }
+// ═══════════════════════════════════════════════════════
+//  DRAWER
+// ═══════════════════════════════════════════════════════
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 
@@ -1046,7 +1175,7 @@ function toast(msg){
 //  KEYBOARD
 // ═══════════════════════════════════════════════════════
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape')['editOverlay','detailOverlay','setupOverlay'].forEach(id=>closeModal(id));
+  if(e.key==='Escape'){['editOverlay','detailOverlay','setupOverlay'].forEach(id=>closeModal(id));closeDrawer();}
   if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.getElementById('searchInput').focus();}
 });
 
