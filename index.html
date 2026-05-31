@@ -368,11 +368,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .drawer-sync-btn:hover{background:var(--bg4);color:var(--text);}
 .hamburger{
   display:none;flex-shrink:0;
-  background:none;border:none;
-  color:var(--text2);padding:6px 8px;border-radius:var(--r);
-  cursor:pointer;font-size:20px;line-height:1;transition:all .1s;
+  background:#1a1d23;border:none;
+  color:#fff;padding:6px 10px;border-radius:var(--r);
+  cursor:pointer;font-size:18px;line-height:1;transition:all .1s;
 }
-.hamburger:hover{background:var(--bg3);color:var(--text);}
+.hamburger:hover{background:#2d3142;}
 
 /* ═══ RESPONSIVE ═══ */
 @media(max-width:640px){
@@ -380,6 +380,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   .bottom-nav{display:none;}
   .hamburger{display:flex;align-items:center;}
   .header-btn:not(.primary){display:none;}
+  .search-wrap{min-width:0;flex:1;}
+  .search-wrap input{min-width:0;width:100%;}
+  .logo{display:none;}
   .form-row-2{grid-template-columns:1fr;}
   .card-actions .ic-btn:not(.copy-btn){display:none;}
   .cards{padding:10px 12px;}
