@@ -313,10 +313,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
 /* ═══ DRAWER (SP) ═══ */
 .drawer-overlay{
-  display:none;position:fixed;inset:0;background:rgba(0,0,0,0);
+  position:fixed;inset:0;background:rgba(0,0,0,0);
   z-index:200;transition:background .25s;
+  pointer-events:none;
 }
-.drawer-overlay.open{background:rgba(0,0,0,0.35);}
+.drawer-overlay.open{background:rgba(0,0,0,0.35);pointer-events:all;}
 .drawer{
   position:fixed;top:0;left:0;bottom:0;width:280px;
   background:var(--bg2);box-shadow:4px 0 24px rgba(0,0,0,0.12);
@@ -378,7 +379,6 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   .sidebar{display:none;}
   .bottom-nav{display:none;}
   .hamburger{display:flex;align-items:center;}
-  .drawer-overlay{display:block;}
   .header-btn:not(.primary):not(.sp-show){display:none;}
   .form-row-2{grid-template-columns:1fr;}
   .card-actions .ic-btn:not(.copy-btn){display:none;}
@@ -387,7 +387,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 }
 @media(min-width:641px){
   .bottom-nav{display:none;}
-  .drawer-overlay{display:none !important;}
+  .hamburger{display:none;}
+  .drawer{display:none;}
   .overlay{align-items:center;}
   .modal{border-radius:16px;margin:16px;box-shadow:var(--shadow-md);}
   .modal-bar{display:none;}
@@ -1151,13 +1152,19 @@ function saveCustomModel(){
 //  DRAWER
 // ═══════════════════════════════════════════════════════
 function openDrawer(){
-  document.getElementById('drawer').classList.add('open');
-  document.getElementById('drawerOverlay').classList.add('open');
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if(!drawer || !overlay) return;
+  drawer.classList.add('open');
+  overlay.classList.add('open');
   document.body.style.overflow='hidden';
 }
 function closeDrawer(){
-  document.getElementById('drawer').classList.remove('open');
-  document.getElementById('drawerOverlay').classList.remove('open');
+  const drawer = document.getElementById('drawer');
+  const overlay = document.getElementById('drawerOverlay');
+  if(!drawer || !overlay) return;
+  drawer.classList.remove('open');
+  overlay.classList.remove('open');
   document.body.style.overflow='';
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
