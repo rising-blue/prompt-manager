@@ -38,7 +38,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 /* HEADER */
 .header{
   flex-shrink:0;height:var(--header-h);
-  display:flex;align-items:center;gap:12px;padding:0 16px;
+  display:flex;align-items:center;gap:8px;padding:0 12px;
   border-bottom:1px solid var(--border);background:var(--bg2);z-index:50;box-shadow:var(--shadow);
 }
 .logo{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;white-space:nowrap;}
@@ -313,11 +313,11 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
 /* ═══ DRAWER (SP) ═══ */
 .drawer-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0);
-  z-index:200;transition:background .25s;
-  pointer-events:none;
+  position:fixed;inset:0;background:rgba(0,0,0,0.35);
+  z-index:200;
+  visibility:hidden;opacity:0;transition:opacity .25s,visibility .25s;
 }
-.drawer-overlay.open{background:rgba(0,0,0,0.35);pointer-events:all;}
+.drawer-overlay.open{visibility:visible;opacity:1;}
 .drawer{
   position:fixed;top:0;left:0;bottom:0;width:280px;
   background:var(--bg2);box-shadow:4px 0 24px rgba(0,0,0,0.12);
@@ -368,9 +368,9 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .drawer-sync-btn:hover{background:var(--bg4);color:var(--text);}
 .hamburger{
   display:none;flex-shrink:0;
-  background:none;border:1px solid var(--border);
-  color:var(--text2);padding:7px 10px;border-radius:var(--r);
-  cursor:pointer;font-size:16px;line-height:1;transition:all .1s;
+  background:none;border:none;
+  color:var(--text2);padding:6px 8px;border-radius:var(--r);
+  cursor:pointer;font-size:20px;line-height:1;transition:all .1s;
 }
 .hamburger:hover{background:var(--bg3);color:var(--text);}
 
@@ -379,7 +379,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   .sidebar{display:none;}
   .bottom-nav{display:none;}
   .hamburger{display:flex;align-items:center;}
-  .header-btn:not(.primary):not(.sp-show){display:none;}
+  .header-btn:not(.primary){display:none;}
   .form-row-2{grid-template-columns:1fr;}
   .card-actions .ic-btn:not(.copy-btn){display:none;}
   .cards{padding:10px 12px;}
@@ -388,7 +388,7 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 @media(min-width:641px){
   .bottom-nav{display:none;}
   .hamburger{display:none;}
-  .drawer{display:none;}
+  .drawer,.drawer-overlay{display:none !important;}
   .overlay{align-items:center;}
   .modal{border-radius:16px;margin:16px;box-shadow:var(--shadow-md);}
   .modal-bar{display:none;}
@@ -459,8 +459,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 </div>
 
 <!-- DRAWER OVERLAY & DRAWER (SP) -->
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
-<div class="drawer" id="drawer">
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()" style="display:none"></div>
+<div class="drawer" id="drawer" style="display:none">
   <div class="drawer-header">
     <span class="drawer-title">PM<em style="color:var(--border2);font-style:normal">/</em>AI</span>
     <button class="drawer-close" onclick="closeDrawer()">×</button>
@@ -1154,18 +1154,32 @@ function saveCustomModel(){
 function openDrawer(){
   const drawer = document.getElementById('drawer');
   const overlay = document.getElementById('drawerOverlay');
-  if(!drawer || !overlay) return;
-  drawer.classList.add('open');
-  overlay.classList.add('open');
+  if(!drawer||!overlay)return;
+  // SPのみ動作
+  if(window.innerWidth>640)return;
+  drawer.style.display='flex';
+  overlay.style.display='block';
+  // 次フレームでアニメーション開始
+  requestAnimationFrame(()=>{
+    drawer.classList.add('open');
+    overlay.classList.add('open');
+  });
   document.body.style.overflow='hidden';
 }
 function closeDrawer(){
   const drawer = document.getElementById('drawer');
   const overlay = document.getElementById('drawerOverlay');
-  if(!drawer || !overlay) return;
+  if(!drawer||!overlay)return;
   drawer.classList.remove('open');
   overlay.classList.remove('open');
   document.body.style.overflow='';
+  // アニメーション後にhide
+  setTimeout(()=>{
+    if(!drawer.classList.contains('open')){
+      drawer.style.display='none';
+      overlay.style.display='none';
+    }
+  },260);
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
