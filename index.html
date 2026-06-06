@@ -273,6 +273,74 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 
 /* DETAIL MODAL */
 .detail-body{padding:18px;display:flex;flex-direction:column;gap:14px;}
+/* IMAGE UPLOAD */
+.img-upload-area{
+  border:2px dashed var(--border2);border-radius:var(--r);
+  padding:20px;text-align:center;cursor:pointer;
+  transition:all .15s;background:var(--bg3);
+  color:var(--text3);font-size:13px;
+}
+.img-upload-area:hover,.img-upload-area.drag{
+  border-color:#1a73e8;background:rgba(26,115,232,0.04);color:var(--text2);
+}
+.img-upload-area input{display:none;}
+.img-preview-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.img-thumb{
+  position:relative;width:80px;height:80px;border-radius:6px;
+  overflow:hidden;border:1px solid var(--border);flex-shrink:0;
+  background:var(--bg3);
+}
+.img-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
+.img-thumb-del{
+  position:absolute;top:3px;right:3px;
+  background:rgba(0,0,0,0.6);color:#fff;border:none;
+  width:20px;height:20px;border-radius:50%;font-size:12px;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  line-height:1;
+}
+.img-uploading{
+  position:absolute;inset:0;background:rgba(255,255,255,0.75);
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;color:var(--text2);font-family:var(--mono);
+}
+/* CARD IMAGE STRIP */
+.card-images{display:flex;gap:6px;padding:0 13px 10px;flex-wrap:wrap;}
+.card-img-thumb{
+  width:64px;height:64px;border-radius:6px;object-fit:cover;
+  border:1px solid var(--border);cursor:pointer;transition:opacity .1s;
+}
+.card-img-thumb:hover{opacity:.85;}
+/* IMAGE LIGHTBOX */
+.lightbox{
+  position:fixed;inset:0;background:rgba(0,0,0,0.88);
+  z-index:300;display:none;align-items:center;justify-content:center;
+}
+.lightbox.open{display:flex;}
+.lightbox img{
+  max-width:92vw;max-height:88vh;border-radius:8px;
+  object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.4);
+}
+.lightbox-close{
+  position:fixed;top:16px;right:16px;
+  background:rgba(255,255,255,0.15);border:none;color:#fff;
+  font-size:28px;width:44px;height:44px;border-radius:50%;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.lightbox-close:hover{background:rgba(255,255,255,0.25);}
+.lightbox-nav{
+  position:fixed;top:50%;transform:translateY(-50%);
+  background:rgba(255,255,255,0.15);border:none;color:#fff;
+  font-size:24px;width:44px;height:44px;border-radius:50%;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+.lightbox-nav:hover{background:rgba(255,255,255,0.25);}
+.lightbox-prev{left:12px;}
+.lightbox-next{right:12px;}
+.lightbox-counter{
+  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  color:rgba(255,255,255,0.7);font-family:var(--mono);font-size:12px;
+}
+
 .detail-prompt{
   font-family:var(--mono);font-size:12px;color:var(--text);
   line-height:1.8;white-space:pre-wrap;word-break:break-word;
@@ -541,6 +609,17 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
         <input class="form-input" id="fNote" placeholder="使用場面・注意点など">
       </div>
       <div class="form-row">
+        <label class="form-label">画像（最大5枚）</label>
+        <div class="img-upload-area" id="imgUploadArea"
+          ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropImage(event)"
+          onclick="document.getElementById('imgFileInput').click()">
+          <div>📎 タップまたはドラッグで画像を追加</div>
+          <div style="font-size:11px;margin-top:4px;font-family:var(--mono)">JPG / PNG / WebP・1枚あたり5MB以下</div>
+          <input type="file" id="imgFileInput" accept="image/*" multiple onchange="handleImageFiles(event)">
+        </div>
+        <div class="img-preview-grid" id="imgPreviewGrid"></div>
+      </div>
+      <div class="form-row">
         <label class="form-label">引用元URL</label>
         <div style="display:flex;gap:8px;align-items:center;">
           <input class="form-input" id="fSourceUrl" placeholder="https://…" style="flex:1;" oninput="onUrlInput()">
@@ -575,6 +654,10 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
         <div class="form-label" style="margin-bottom:5px">メモ</div>
         <div style="font-size:13px;color:var(--text2)" id="dtNote"></div>
       </div>
+    </div>
+    <div id="dtImagesWrap" style="display:none">
+      <div class="form-label" style="margin-bottom:8px">添付画像</div>
+      <div class="img-preview-grid" id="dtImages"></div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-sec" onclick="editFromDetail()">編集</button>
@@ -626,6 +709,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
   </div>
 </div>
 
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <button class="lightbox-close" onclick="closeLightbox()">×</button>
+  <button class="lightbox-nav lightbox-prev" onclick="lbNav(-1);event.stopPropagation()">‹</button>
+  <img id="lightboxImg" src="" alt="">
+  <button class="lightbox-nav lightbox-next" onclick="lbNav(1);event.stopPropagation()">›</button>
+  <div class="lightbox-counter" id="lbCounter"></div>
+</div>
+
 <!-- ADD MODEL MODAL -->
 <div class="overlay" id="addModelOverlay" onclick="bgClose(event,'addModelOverlay')">
   <div class="modal">
@@ -673,6 +765,10 @@ const BUILTIN_MODELS = [
   {id:'claudecode',label:'Claude Code', color:'#b084f5'},
 ];
 let customModels = []; // {id, label, color}
+// 画像アップロード用state
+let editImages = []; // [{fileId, url, uploading}]
+let lbImages   = []; // ライトボックス用URL配列
+let lbIndex    = 0;
 function allModels(){ return [...BUILTIN_MODELS, ...customModels]; }
 function modelLabel(id){ return (allModels().find(m=>m.id===id)||{label:id}).label; }
 function modelColor(id){ return (allModels().find(m=>m.id===id)||{color:'#888'}).color; }
@@ -781,6 +877,118 @@ async function pushToSheets(action,payload){
     console.warn('Sheets push failed:',e.message);
     setSyncStatus('err','保存失敗 — 手動同期してください');
   }
+}
+
+// ═══════════════════════════════════════════════════════
+//  IMAGE UPLOAD
+// ═══════════════════════════════════════════════════════
+const MAX_IMAGES = 5;
+const MAX_SIZE   = 5 * 1024 * 1024; // 5MB
+
+function renderImgPreview(){
+  const grid = document.getElementById('imgPreviewGrid');
+  if(!grid) return;
+  grid.innerHTML = editImages.map((img,i) => `
+    <div class="img-thumb" id="imgthumb-${i}">
+      ${img.url ? `<img src="${img.url}" onerror="this.src=''">` : ''}
+      ${img.uploading ? `<div class="img-uploading">↑</div>` : ''}
+      ${!img.uploading ? `<button class="img-thumb-del" onclick="removeImg(${i})">×</button>` : ''}
+    </div>`).join('');
+  // アップロード枠の表示切替
+  const area = document.getElementById('imgUploadArea');
+  if(area) area.style.display = editImages.length >= MAX_IMAGES ? 'none' : 'block';
+}
+
+async function handleImageFiles(e){
+  const files = Array.from(e.target.files);
+  e.target.value = '';
+  for(const file of files){
+    if(editImages.length >= MAX_IMAGES){ toast('画像は最大'+MAX_IMAGES+'枚です'); break; }
+    if(file.size > MAX_SIZE){ toast(file.name+' はサイズ超過（5MB以下）'); continue; }
+    await uploadImageFile(file);
+  }
+}
+
+function dragOver(e){ e.preventDefault(); document.getElementById('imgUploadArea').classList.add('drag'); }
+function dragLeave(e){ document.getElementById('imgUploadArea').classList.remove('drag'); }
+async function dropImage(e){
+  e.preventDefault();
+  document.getElementById('imgUploadArea').classList.remove('drag');
+  const files = Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+  for(const file of files){
+    if(editImages.length >= MAX_IMAGES){ toast('画像は最大'+MAX_IMAGES+'枚です'); break; }
+    if(file.size > MAX_SIZE){ toast(file.name+' はサイズ超過（5MB以下）'); continue; }
+    await uploadImageFile(file);
+  }
+}
+
+async function uploadImageFile(file){
+  if(!gasUrl){ toast('先にGAS URLを設定してください'); return; }
+  // プレビュー用ローカルURL
+  const localUrl = URL.createObjectURL(file);
+  const idx = editImages.length;
+  editImages.push({ fileId:'', url:localUrl, uploading:true });
+  renderImgPreview();
+  try{
+    const base64 = await fileToBase64(file);
+    const res = await gasPost({
+      action: 'uploadImage',
+      payload: { base64, mimeType: file.type, fileName: file.name }
+    });
+    if(res && res.ok){
+      editImages[idx] = { fileId: res.fileId, url: res.url, uploading: false };
+    } else {
+      editImages.splice(idx, 1);
+      toast('アップロード失敗: '+(res&&res.error||'不明'));
+    }
+  }catch(e){
+    editImages.splice(idx, 1);
+    toast('アップロードエラー: '+e.message);
+  }
+  renderImgPreview();
+}
+
+function fileToBase64(file){
+  return new Promise((res,rej)=>{
+    const r = new FileReader();
+    r.onload = e => res(e.target.result.split(',')[1]);
+    r.onerror = rej;
+    r.readAsDataURL(file);
+  });
+}
+
+async function removeImg(i){
+  const img = editImages[i];
+  if(img && img.fileId && gasUrl){
+    gasPost({ action:'deleteImage', payload:{ fileId: img.fileId } });
+  }
+  editImages.splice(i, 1);
+  renderImgPreview();
+}
+
+// LIGHTBOX
+function openLightbox(promptId, startIdx){
+  const p = prompts.find(x=>x.id===promptId);
+  if(!p||!p.imageIds||!p.imageIds.length) return;
+  lbImages = p.imageIds.map(fid=>'https://drive.google.com/uc?export=view&id='+fid);
+  lbIndex  = startIdx || 0;
+  showLbImage();
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){
+  document.getElementById('lightbox').classList.remove('open');
+}
+function lbNav(dir){
+  lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
+  showLbImage();
+}
+function showLbImage(){
+  document.getElementById('lightboxImg').src = lbImages[lbIndex];
+  document.getElementById('lbCounter').textContent =
+    lbImages.length > 1 ? (lbIndex+1)+' / '+lbImages.length : '';
+  // ナビボタン表示切替
+  document.querySelector('.lightbox-prev').style.display = lbImages.length>1?'flex':'none';
+  document.querySelector('.lightbox-next').style.display = lbImages.length>1?'flex':'none';
 }
 
 // ═══════════════════════════════════════════════════════
@@ -940,6 +1148,7 @@ function renderCards(){
       <div class="card-body">
         <div class="card-preview" id="pv-${p.id}" onclick="openDetail('${p.id}')">${esc(p.prompt)}</div>
       </div>
+      \${p.imageIds&&p.imageIds.length?`<div class="card-images">\${p.imageIds.map((fid,i)=>`<img class="card-img-thumb" src="https://drive.google.com/uc?export=view&id=\${fid}" loading="lazy" onclick="openLightbox('\${p.id}',\${i});event.stopPropagation()" onerror="this.style.display='none'">`).join('')}</div>`:''}
       <div class="card-foot">
         <div class="card-tags">${(p.tags||[]).map(t=>`<span class="c-tag" onclick="filterTag('${esc(t)}');event.stopPropagation()">#${esc(t)}</span>`).join('')}</div>
         ${p.rating?`<div class="stars">${[1,2,3,4,5].map(i=>`<div class="star-d${i<=p.rating?' on':''}"></div>`).join('')}</div>`:''}
@@ -995,6 +1204,16 @@ function openDetail(id){
   const nw=document.getElementById('dtNoteWrap');
   if(p.note){nw.style.display='block';document.getElementById('dtNote').textContent=p.note;}
   else nw.style.display='none';
+  const iw=document.getElementById('dtImagesWrap');
+  const ig=document.getElementById('dtImages');
+  if(p.imageIds&&p.imageIds.length){
+    iw.style.display='block';
+    ig.innerHTML=p.imageIds.map((fid,i)=>`
+      <div class="img-thumb">
+        <img src="https://drive.google.com/uc?export=view&id=${fid}" loading="lazy"
+          onclick="openLightbox('${p.id}',${i})" onerror="this.parentNode.style.display='none'">
+      </div>`).join('');
+  }else iw.style.display='none';
   document.getElementById('detailOverlay').classList.add('open');
 }
 function editFromDetail(){closeModal('detailOverlay');openEdit(detailId);}
@@ -1007,6 +1226,7 @@ function openAdd(){
   document.getElementById('editTitle').textContent='プロンプトを追加';
   document.getElementById('delBtn').style.display='none';
   ['fTitle','fPrompt','fTags','fCat','fNote','fSourceUrl','fSourceTitle'].forEach(id=>document.getElementById(id).value='');
+  editImages=[];renderImgPreview();
   const defaultModel=activeModel!=='all'?activeModel:(allModels()[0]||{id:'claude'}).id;
   document.getElementById('fModel').value=defaultModel;
   document.getElementById('fRating').value='0';
@@ -1028,6 +1248,8 @@ function openEdit(id,e){
   document.getElementById('fRating').value=p.rating||'0';
   document.getElementById('fSourceUrl').value=p.sourceUrl||'';
   document.getElementById('fSourceTitle').value=p.sourceTitle||'';
+  editImages=(p.imageIds||[]).map(fid=>({fileId:fid,url:'https://drive.google.com/uc?export=view&id='+fid,uploading:false}));
+  renderImgPreview();
   document.getElementById('editOverlay').classList.add('open');
 }
 function savePrompt(){
@@ -1044,6 +1266,7 @@ function savePrompt(){
     rating:parseInt(document.getElementById('fRating').value)||0,
     sourceUrl:document.getElementById('fSourceUrl').value.trim(),
     sourceTitle:document.getElementById('fSourceTitle').value.trim(),
+    imageIds:editImages.filter(i=>i.fileId&&!i.uploading).map(i=>i.fileId),
     updatedAt:now,
   };
   if(editId){
@@ -1199,7 +1422,7 @@ function toast(msg){
 //  KEYBOARD
 // ═══════════════════════════════════════════════════════
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){['editOverlay','detailOverlay','setupOverlay'].forEach(id=>closeModal(id));closeDrawer();}
+  if(e.key==='Escape'){['editOverlay','detailOverlay','setupOverlay'].forEach(id=>closeModal(id));closeDrawer();closeLightbox();}
   if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.getElementById('searchInput').focus();}
 });
 
