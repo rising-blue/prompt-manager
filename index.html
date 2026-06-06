@@ -3,8 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<meta name="mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-capable" content="yes">
 <title>Prompt Manager</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
@@ -26,239 +24,124 @@
   --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
   --shadow-md:0 4px 12px rgba(0,0,0,0.08),0 2px 4px rgba(0,0,0,0.04);
   --r:10px;--mono:'IBM Plex Mono',monospace;--sans:'Noto Sans JP',sans-serif;
-  --header-h:56px;--nav-h:60px;
+  --header-h:56px;
 }
 html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:14px;line-height:1.6;overscroll-behavior:none;}
-
-/* ═══════════════════════════════════════
-   LAYOUT — PC: sidebar + main / SP: tabs
-═══════════════════════════════════════ */
 .app{display:flex;flex-direction:column;height:100vh;overflow:hidden;}
 
 /* HEADER */
-.header{
-  flex-shrink:0;height:var(--header-h);
-  display:flex;align-items:center;gap:8px;padding:0 12px;
-  border-bottom:1px solid var(--border);background:var(--bg2);z-index:50;box-shadow:var(--shadow);
-}
+.header{flex-shrink:0;height:var(--header-h);display:flex;align-items:center;gap:8px;padding:0 12px;border-bottom:1px solid var(--border);background:var(--bg2);z-index:50;box-shadow:var(--shadow);}
 .logo{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;white-space:nowrap;}
 .logo em{color:var(--border2);font-style:normal;}
-.search-wrap{
-  flex:1;display:flex;align-items:center;gap:8px;
-  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
-  padding:0 12px;
-}
-.search-wrap input{
-  flex:1;background:none;border:none;outline:none;
-  color:var(--text);font-size:13px;font-family:var(--sans);padding:9px 0;
-}
+.search-wrap{flex:1;display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:0 12px;}
+.search-wrap input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:13px;font-family:var(--sans);padding:9px 0;}
 .search-wrap input::placeholder{color:var(--text3);}
 .search-icon{color:var(--text3);font-size:15px;flex-shrink:0;}
-.header-btn{
-  flex-shrink:0;background:var(--bg3);border:1px solid var(--border);
-  color:var(--text2);font-family:var(--mono);font-size:11px;
-  padding:7px 12px;border-radius:var(--r);cursor:pointer;white-space:nowrap;
-  transition:all .12s;
-}
+.header-btn{flex-shrink:0;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:7px 12px;border-radius:var(--r);cursor:pointer;white-space:nowrap;transition:all .12s;}
 .header-btn:hover{color:var(--text);border-color:var(--border2);background:var(--bg4);}
 .header-btn.primary{background:#1a1d23;color:#fff;border-color:#1a1d23;}
 .header-btn.primary:hover{background:#2d3142;}
+.hamburger{display:none;flex-shrink:0;background:#1a1d23;border:none;color:#fff;padding:6px 10px;border-radius:var(--r);cursor:pointer;font-size:18px;line-height:1;transition:all .1s;}
+.hamburger:hover{background:#2d3142;}
+
+/* SYNC STATUS */
+.sync-status{flex-shrink:0;display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:10px;color:var(--text2);padding:6px 16px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);}
+.sync-dot.ok{background:var(--ok);}
+.sync-dot.err{background:var(--danger);}
+.sync-dot.loading{background:var(--warn);animation:pulse .8s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 
 /* BODY */
 .body{flex:1;display:flex;overflow:hidden;}
 
 /* SIDEBAR (PC) */
-.sidebar{
-  width:200px;flex-shrink:0;overflow-y:auto;
-  border-right:1px solid var(--border);padding:14px 0;
-  background:var(--bg2);
-}
-.sb-label{
-  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
-  color:var(--text3);text-transform:uppercase;
-  padding:0 14px 7px;
-}
-.sb-item{
-  display:flex;align-items:center;gap:9px;
-  padding:8px 14px;cursor:pointer;border-left:2px solid transparent;
-  font-size:13px;color:var(--text2);transition:all .1s;user-select:none;
-}
+.sidebar{width:200px;flex-shrink:0;overflow-y:auto;border-right:1px solid var(--border);padding:14px 0;background:var(--bg2);}
+.sb-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;padding:0 14px 7px;}
+.sb-item{display:flex;align-items:center;gap:9px;padding:8px 14px;cursor:pointer;border-left:2px solid transparent;font-size:13px;color:var(--text2);transition:all .1s;user-select:none;}
 .sb-item:hover{background:var(--bg3);color:var(--text);}
 .sb-item.active{background:var(--bg3);color:var(--text);}
-.sb-item.active[data-model="claude"]{border-left-color:var(--claude);color:var(--claude);}
-.sb-item.active[data-model="gemini"]{border-left-color:var(--gemini);color:var(--gemini);}
-.sb-item.active[data-model="chatgpt"]{border-left-color:var(--gpt);color:var(--gpt);}
-.sb-item.active[data-model="all"]{border-left-color:var(--text2);}
-.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
-.dot-all{background:var(--text3);}
-.dot-claude{background:var(--claude);}
-.dot-gemini{background:var(--gemini);}
-.dot-gpt{background:var(--gpt);}
-.dot-grok{background:var(--grok);}
-.dot-perplexity{background:var(--perplexity);}
-.dot-copilot{background:var(--copilot);}
-.dot-claudecode{background:var(--claudecode);}
-.dot-custom{background:var(--custom);}
 .sb-count{margin-left:auto;font-family:var(--mono);font-size:10px;color:var(--text3);background:var(--bg4);padding:1px 6px;border-radius:10px;}
 .sb-section{margin-bottom:20px;}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot-all{background:var(--text3);}
 .tag-cloud{padding:0 10px;display:flex;flex-wrap:wrap;gap:5px;}
-.tag-chip{
-  font-size:10px;font-family:var(--mono);padding:3px 7px;
-  border:1px solid var(--border2);border-radius:4px;
-  cursor:pointer;color:var(--text3);background:none;transition:all .1s;
-}
+.tag-chip{font-size:10px;font-family:var(--mono);padding:3px 7px;border:1px solid var(--border2);border-radius:4px;cursor:pointer;color:var(--text3);background:none;transition:all .1s;}
 .tag-chip:hover{border-color:var(--text3);color:var(--text2);}
 .tag-chip.active{border-color:var(--text2);color:var(--text);background:var(--bg4);}
+.sync-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:6px;cursor:pointer;transition:all .1s;}
+.sync-btn:hover{color:var(--text);border-color:var(--border2);background:var(--bg4);}
 
 /* MAIN */
 .main{flex:1;overflow-y:auto;display:flex;flex-direction:column;}
-.toolbar{
-  flex-shrink:0;display:flex;align-items:center;gap:8px;
-  padding:12px 16px;border-bottom:1px solid var(--border);
-  background:var(--bg2);
-}
-.sort-sel{
-  background:var(--bg3);border:1px solid var(--border);color:var(--text2);
-  font-family:var(--mono);font-size:11px;padding:5px 9px;border-radius:6px;
-  outline:none;cursor:pointer;
-}
+.toolbar{flex-shrink:0;display:flex;align-items:center;gap:8px;padding:12px 16px;border-bottom:1px solid var(--border);background:var(--bg2);}
+.sort-sel{background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:11px;padding:5px 9px;border-radius:6px;outline:none;cursor:pointer;}
 .count-lbl{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text3);}
-.sync-btn{
-  background:var(--bg3);border:1px solid var(--border);color:var(--text2);
-  font-family:var(--mono);font-size:11px;padding:5px 10px;border-radius:6px;
-  cursor:pointer;transition:all .1s;
-}
-.sync-btn:hover{color:var(--text);border-color:var(--border2);background:var(--bg4);}
-.sync-btn.syncing{animation:spin .8s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
-
 .cards{padding:12px 16px;display:flex;flex-direction:column;gap:8px;}
 
 /* CARD */
-.card{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:var(--r);overflow:hidden;transition:all .15s;
-  box-shadow:var(--shadow);
-}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;transition:all .15s;box-shadow:var(--shadow);}
 .card:hover{border-color:var(--border2);box-shadow:var(--shadow-md);}
 .card-head{display:flex;align-items:center;gap:8px;padding:11px 13px 9px;}
-.model-badge{
-  font-family:var(--mono);font-size:10px;font-weight:500;
-  letter-spacing:.06em;padding:2px 7px;border-radius:4px;
-  text-transform:uppercase;flex-shrink:0;
-}
-.b-claude{background:var(--claude-bg);color:var(--claude);}
-.b-gemini{background:var(--gemini-bg);color:var(--gemini);}
-.b-chatgpt{background:var(--gpt-bg);color:var(--gpt);}
-.b-grok{background:var(--grok-bg);color:var(--grok);}
-.b-perplexity{background:var(--perplexity-bg);color:var(--perplexity);}
-.b-copilot{background:var(--copilot-bg);color:var(--copilot);}
-.b-claudecode{background:var(--claudecode-bg);color:var(--claudecode);}
-.b-custom{background:var(--custom-bg);color:var(--custom);}
+.model-badge{font-family:var(--mono);font-size:10px;font-weight:500;letter-spacing:.06em;padding:2px 7px;border-radius:4px;text-transform:uppercase;flex-shrink:0;}
 .card-title{font-size:13px;font-weight:500;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .card-actions{display:flex;gap:3px;flex-shrink:0;}
-.ic-btn{
-  background:none;border:1px solid transparent;color:var(--text3);
-  padding:5px 8px;border-radius:5px;cursor:pointer;font-size:12px;
-  transition:all .1s;font-family:var(--mono);white-space:nowrap;
-  min-height:36px;min-width:36px;display:flex;align-items:center;justify-content:center;
-}
+.ic-btn{background:none;border:1px solid transparent;color:var(--text3);padding:5px 8px;border-radius:5px;cursor:pointer;font-size:12px;transition:all .1s;font-family:var(--mono);white-space:nowrap;min-height:36px;min-width:36px;display:flex;align-items:center;justify-content:center;}
 .ic-btn:hover{border-color:var(--border);color:var(--text2);background:var(--bg3);}
 .ic-btn.copied{color:var(--ok);border-color:var(--ok);}
 .ic-btn.starred{color:var(--warn);}
 .card-body{padding:0 13px 10px;}
-.card-preview{
-  font-family:var(--mono);font-size:11.5px;color:var(--text2);
-  line-height:1.65;white-space:pre-wrap;word-break:break-word;
-  max-height:64px;overflow:hidden;position:relative;cursor:pointer;
-  background:var(--bg3);border-radius:6px;padding:8px 10px;
-}
+.card-preview{font-family:var(--mono);font-size:11.5px;color:var(--text2);line-height:1.65;white-space:pre-wrap;word-break:break-word;max-height:64px;overflow:hidden;position:relative;cursor:pointer;background:var(--bg3);border-radius:6px;padding:8px 10px;}
 .card-preview.expanded{max-height:none;}
-.card-preview:not(.expanded)::after{
-  content:'';position:absolute;bottom:0;left:0;right:0;height:24px;
-  background:linear-gradient(transparent,var(--bg3));pointer-events:none;
-}
-.card-foot{
-  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
-  padding:8px 13px;border-top:1px solid var(--border);background:var(--bg3);
-}
+.card-preview:not(.expanded)::after{content:'';position:absolute;bottom:0;left:0;right:0;height:24px;background:linear-gradient(transparent,var(--bg3));pointer-events:none;}
+.card-images{display:flex;gap:6px;padding:4px 13px 8px;flex-wrap:wrap;}
+.card-img-thumb{width:64px;height:64px;border-radius:6px;object-fit:cover;border:1px solid var(--border);cursor:pointer;transition:opacity .1s;}
+.card-img-thumb:hover{opacity:.85;}
+.card-foot{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:8px 13px;border-top:1px solid var(--border);background:var(--bg3);}
 .card-tags{display:flex;gap:4px;flex-wrap:wrap;flex:1;}
-.c-tag{
-  font-family:var(--mono);font-size:10px;color:var(--text2);
-  background:var(--bg4);padding:2px 7px;border-radius:4px;cursor:pointer;border:1px solid var(--border);
-}
+.c-tag{font-family:var(--mono);font-size:10px;color:var(--text2);background:var(--bg4);padding:2px 7px;border-radius:4px;cursor:pointer;border:1px solid var(--border);}
 .c-tag:hover{color:var(--text);background:var(--border);}
 .stars{display:flex;gap:2px;}
 .star-d{width:6px;height:6px;border-radius:50%;background:var(--border2);}
 .star-d.on{background:var(--warn);}
 .card-date{font-family:var(--mono);font-size:10px;color:var(--text3);margin-left:auto;}
-
-/* EMPTY */
 .empty{text-align:center;padding:60px 20px;color:var(--text3);font-family:var(--mono);background:var(--bg2);border-radius:var(--r);margin:8px;}
 .empty-ico{font-size:36px;margin-bottom:10px;}
 
-/* ═══════════════════════════════════════
-   BOTTOM NAV (SP only)
-═══════════════════════════════════════ */
-.bottom-nav{
-  display:none;flex-shrink:0;
-  height:var(--nav-h);border-top:1px solid var(--border);
-  background:var(--bg2);z-index:50;box-shadow:0 -1px 8px rgba(0,0,0,0.06);
-}
-.bnav-items{display:flex;height:100%;}
-.bnav-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;
-  justify-content:center;gap:3px;cursor:pointer;
-  font-size:10px;font-family:var(--mono);color:var(--text3);
-  border:none;background:none;padding:0;transition:color .1s;
-}
-.bnav-item.active[data-model="all"]{color:var(--text);}
-.bnav-item.active[data-model="claude"]{color:var(--claude);}
-.bnav-item.active[data-model="gemini"]{color:var(--gemini);}
-.bnav-item.active[data-model="chatgpt"]{color:var(--gpt);}
-.bnav-dot{width:7px;height:7px;border-radius:50%;background:currentColor;margin-bottom:1px;}
-.bnav-badge{
-  font-size:9px;background:var(--bg4);padding:1px 5px;
-  border-radius:8px;color:var(--text3);
-}
+/* DRAWER */
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:200;visibility:hidden;opacity:0;transition:opacity .25s,visibility .25s;}
+.drawer-overlay.open{visibility:visible;opacity:1;}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:280px;background:var(--bg2);box-shadow:4px 0 24px rgba(0,0,0,0.12);transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);z-index:201;overflow-y:auto;display:flex;flex-direction:column;}
+.drawer.open{transform:translateX(0);}
+.drawer-header{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 14px;border-bottom:1px solid var(--border);flex-shrink:0;}
+.drawer-title{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;color:var(--text);}
+.drawer-close{background:none;border:none;font-size:22px;color:var(--text3);cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1;}
+.drawer-close:hover{background:var(--bg3);color:var(--text);}
+.drawer-body{flex:1;padding:12px 0;}
+.drawer-label{font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--text3);text-transform:uppercase;padding:8px 16px 6px;}
+.drawer-item{display:flex;align-items:center;gap:10px;padding:11px 16px;cursor:pointer;border-left:3px solid transparent;font-size:14px;color:var(--text2);transition:all .1s;user-select:none;}
+.drawer-item:hover{background:var(--bg3);color:var(--text);}
+.drawer-item.active{background:var(--bg3);color:var(--text);font-weight:500;}
+.drawer-count{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--text3);background:var(--bg4);padding:2px 8px;border-radius:10px;}
+.drawer-tag-cloud{padding:4px 12px 8px;display:flex;flex-wrap:wrap;gap:6px;}
+.drawer-footer{flex-shrink:0;padding:12px 16px;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:8px;}
+.drawer-sync-btn{width:100%;background:var(--bg3);border:1px solid var(--border);color:var(--text2);font-family:var(--mono);font-size:12px;padding:10px;border-radius:var(--r);cursor:pointer;transition:all .1s;}
+.drawer-sync-btn:hover{background:var(--bg4);color:var(--text);}
 
-/* ═══════════════════════════════════════
-   MODAL
-═══════════════════════════════════════ */
-.overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,.75);
-  display:flex;align-items:flex-end;justify-content:center;
-  z-index:100;opacity:0;pointer-events:none;transition:opacity .15s;
-}
+/* MODAL */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .15s;}
 .overlay.open{opacity:1;pointer-events:all;}
-.modal{
-  background:var(--bg2);border:1px solid var(--border);
-  border-radius:20px 20px 0 0;width:100%;max-width:640px;
-  max-height:92vh;overflow-y:auto;
-  transform:translateY(20px);transition:transform .15s;
-  box-shadow:var(--shadow-md);
-}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:20px 20px 0 0;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;transform:translateY(20px);transition:transform .15s;box-shadow:var(--shadow-md);}
 .overlay.open .modal{transform:translateY(0);}
-.modal-bar{
-  width:40px;height:4px;background:var(--border2);border-radius:2px;
-  margin:12px auto 0;
-}
+.modal-bar{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 0;}
 .modal-head{display:flex;align-items:center;padding:16px 20px;border-bottom:1px solid var(--border);}
 .modal-ttl{font-size:14px;font-weight:500;}
-.modal-x{
-  margin-left:auto;background:none;border:none;color:var(--text3);
-  font-size:20px;cursor:pointer;padding:2px 6px;border-radius:6px;
-}
+.modal-x{margin-left:auto;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:2px 6px;border-radius:6px;}
 .modal-x:hover{color:var(--text);background:var(--bg3);}
 .modal-body{padding:18px;display:flex;flex-direction:column;gap:13px;}
 .form-row{display:flex;flex-direction:column;gap:5px;}
 .form-label{font-family:var(--mono);font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:.08em;font-weight:500;}
-.form-input,.form-textarea,.form-select{
-  background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);
-  color:var(--text);font-family:var(--sans);font-size:14px;padding:11px 13px;
-  outline:none;width:100%;transition:border-color .15s;
-  -webkit-appearance:none;
-}
+.form-input,.form-textarea,.form-select{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:var(--sans);font-size:14px;padding:11px 13px;outline:none;width:100%;transition:border-color .15s;-webkit-appearance:none;}
 .form-input:focus,.form-textarea:focus,.form-select:focus{border-color:#1a73e8;box-shadow:0 0 0 3px rgba(26,115,232,0.12);}
 .form-textarea{resize:vertical;min-height:130px;font-family:var(--mono);font-size:12px;line-height:1.65;}
 .form-row-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
@@ -271,195 +154,59 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 .btn-del{background:none;color:var(--danger);border-color:rgba(220,38,38,0.3);margin-right:auto;}
 .btn-del:hover{background:rgba(220,38,38,0.06);border-color:var(--danger);}
 
-/* DETAIL MODAL */
-.detail-body{padding:18px;display:flex;flex-direction:column;gap:14px;}
 /* IMAGE UPLOAD */
-.img-upload-area{
-  border:2px dashed var(--border2);border-radius:var(--r);
-  padding:20px;text-align:center;cursor:pointer;
-  transition:all .15s;background:var(--bg3);
-  color:var(--text3);font-size:13px;
-}
-.img-upload-area:hover,.img-upload-area.drag{
-  border-color:#1a73e8;background:rgba(26,115,232,0.04);color:var(--text2);
-}
-.img-upload-area input{display:none;}
+.img-upload-area{border:2px dashed var(--border2);border-radius:var(--r);padding:20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg3);color:var(--text3);font-size:13px;}
+.img-upload-area:hover,.img-upload-area.drag{border-color:#1a73e8;background:rgba(26,115,232,0.04);color:var(--text2);}
 .img-preview-grid{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-.img-thumb{
-  position:relative;width:80px;height:80px;border-radius:6px;
-  overflow:hidden;border:1px solid var(--border);flex-shrink:0;
-  background:var(--bg3);
-}
+.img-thumb{position:relative;width:80px;height:80px;border-radius:6px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;background:var(--bg3);}
 .img-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.img-thumb-del{
-  position:absolute;top:3px;right:3px;
-  background:rgba(0,0,0,0.6);color:#fff;border:none;
-  width:20px;height:20px;border-radius:50%;font-size:12px;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-  line-height:1;
-}
-.img-uploading{
-  position:absolute;inset:0;background:rgba(255,255,255,0.75);
-  display:flex;align-items:center;justify-content:center;
-  font-size:11px;color:var(--text2);font-family:var(--mono);
-}
-/* CARD IMAGE STRIP */
-.card-images{display:flex;gap:6px;padding:0 13px 10px;flex-wrap:wrap;}
-.card-img-thumb{
-  width:64px;height:64px;border-radius:6px;object-fit:cover;
-  border:1px solid var(--border);cursor:pointer;transition:opacity .1s;
-}
-.card-img-thumb:hover{opacity:.85;}
-/* IMAGE LIGHTBOX */
-.lightbox{
-  position:fixed;inset:0;background:rgba(0,0,0,0.88);
-  z-index:300;display:none;align-items:center;justify-content:center;
-}
-.lightbox.open{display:flex;}
-.lightbox img{
-  max-width:92vw;max-height:88vh;border-radius:8px;
-  object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.4);
-}
-.lightbox-close{
-  position:fixed;top:16px;right:16px;
-  background:rgba(255,255,255,0.15);border:none;color:#fff;
-  font-size:28px;width:44px;height:44px;border-radius:50%;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-}
-.lightbox-close:hover{background:rgba(255,255,255,0.25);}
-.lightbox-nav{
-  position:fixed;top:50%;transform:translateY(-50%);
-  background:rgba(255,255,255,0.15);border:none;color:#fff;
-  font-size:24px;width:44px;height:44px;border-radius:50%;
-  cursor:pointer;display:flex;align-items:center;justify-content:center;
-}
-.lightbox-nav:hover{background:rgba(255,255,255,0.25);}
-.lightbox-prev{left:12px;}
-.lightbox-next{right:12px;}
-.lightbox-counter{
-  position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-  color:rgba(255,255,255,0.7);font-family:var(--mono);font-size:12px;
-}
+.img-thumb-del{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.6);color:#fff;border:none;width:20px;height:20px;border-radius:50%;font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;line-height:1;}
+.img-uploading{position:absolute;inset:0;background:rgba(255,255,255,0.75);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--text2);font-family:var(--mono);}
 
-.detail-prompt{
-  font-family:var(--mono);font-size:12px;color:var(--text);
-  line-height:1.8;white-space:pre-wrap;word-break:break-word;
-  background:var(--bg3);border-radius:var(--r);padding:16px;
-  border:1px solid var(--border);
-}
+/* DETAIL */
+.detail-body{padding:18px;display:flex;flex-direction:column;gap:14px;}
+.detail-prompt{font-family:var(--mono);font-size:12px;color:var(--text);line-height:1.8;white-space:pre-wrap;word-break:break-word;background:var(--bg3);border-radius:var(--r);padding:16px;border:1px solid var(--border);}
 .detail-meta{display:flex;gap:12px;flex-wrap:wrap;}
 .d-meta{font-family:var(--mono);font-size:11px;color:var(--text2);}
 .d-meta span{color:var(--text);font-weight:500;}
 
-/* SETUP MODAL */
+/* SETUP */
 .setup-box{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
 .setup-box p{font-size:13px;color:var(--text2);margin-bottom:10px;line-height:1.7;}
 .setup-box ol{padding-left:18px;font-size:13px;color:var(--text2);line-height:2.2;}
 .setup-box code{font-family:var(--mono);font-size:11px;background:var(--bg4);border:1px solid var(--border);padding:2px 6px;border-radius:3px;color:var(--text);}
 
+/* LIGHTBOX */
+.lightbox{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:300;display:none;align-items:center;justify-content:center;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:8px;object-fit:contain;box-shadow:0 8px 40px rgba(0,0,0,0.4);}
+.lb-close{position:fixed;top:16px;right:16px;background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:28px;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.lb-close:hover{background:rgba(255,255,255,0.25);}
+.lb-nav{position:fixed;top:50%;transform:translateY(-50%);background:rgba(255,255,255,0.15);border:none;color:#fff;font-size:24px;width:44px;height:44px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.lb-nav:hover{background:rgba(255,255,255,0.25);}
+.lb-prev{left:12px;}
+.lb-next{right:12px;}
+.lb-counter{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,0.7);font-family:var(--mono);font-size:12px;}
+
 /* TOAST */
-.toast{
-  position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);
-  background:#1a1d23;border:none;color:#fff;
-  font-family:var(--mono);font-size:12px;padding:10px 18px;border-radius:20px;
-  opacity:0;transition:all .2s;z-index:200;pointer-events:none;white-space:nowrap;
-  box-shadow:0 4px 16px rgba(0,0,0,0.18);
-}
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);background:#1a1d23;border:none;color:#fff;font-family:var(--mono);font-size:12px;padding:10px 18px;border-radius:20px;opacity:0;transition:all .2s;z-index:400;pointer-events:none;white-space:nowrap;box-shadow:0 4px 16px rgba(0,0,0,0.18);}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
-/* SYNC STATUS */
-.sync-status{
-  display:flex;align-items:center;gap:6px;
-  font-family:var(--mono);font-size:10px;color:var(--text2);
-  padding:6px 16px;border-bottom:1px solid var(--border);background:var(--bg2);
-}
-.sync-dot{width:6px;height:6px;border-radius:50%;background:var(--text3);}
-.sync-dot.ok{background:var(--ok);}
-.sync-dot.err{background:var(--danger);}
-.sync-dot.loading{background:var(--warn);animation:pulse .8s ease-in-out infinite;}
-@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
-
-/* ═══ DRAWER (SP) ═══ */
-.drawer-overlay{
-  position:fixed;inset:0;background:rgba(0,0,0,0.35);
-  z-index:200;
-  visibility:hidden;opacity:0;transition:opacity .25s,visibility .25s;
-}
-.drawer-overlay.open{visibility:visible;opacity:1;}
-.drawer{
-  position:fixed;top:0;left:0;bottom:0;width:280px;
-  background:var(--bg2);box-shadow:4px 0 24px rgba(0,0,0,0.12);
-  transform:translateX(-100%);transition:transform .25s cubic-bezier(.4,0,.2,1);
-  z-index:201;overflow-y:auto;display:flex;flex-direction:column;
-}
-.drawer.open{transform:translateX(0);}
-.drawer-header{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:18px 16px 14px;border-bottom:1px solid var(--border);
-  flex-shrink:0;
-}
-.drawer-title{font-family:var(--mono);font-size:12px;font-weight:500;letter-spacing:.08em;color:var(--text);}
-.drawer-close{
-  background:none;border:none;font-size:22px;color:var(--text3);
-  cursor:pointer;padding:2px 6px;border-radius:6px;line-height:1;
-}
-.drawer-close:hover{background:var(--bg3);color:var(--text);}
-.drawer-body{flex:1;padding:12px 0;}
-.drawer-section{margin-bottom:8px;}
-.drawer-label{
-  font-family:var(--mono);font-size:10px;letter-spacing:.12em;
-  color:var(--text3);text-transform:uppercase;
-  padding:8px 16px 6px;
-}
-.drawer-item{
-  display:flex;align-items:center;gap:10px;
-  padding:11px 16px;cursor:pointer;border-left:3px solid transparent;
-  font-size:14px;color:var(--text2);transition:all .1s;user-select:none;
-  border-bottom:none;
-}
-.drawer-item:hover{background:var(--bg3);color:var(--text);}
-.drawer-item.active{background:var(--bg3);color:var(--text);font-weight:500;}
-.drawer-count{
-  margin-left:auto;font-family:var(--mono);font-size:11px;
-  color:var(--text3);background:var(--bg4);padding:2px 8px;border-radius:10px;
-}
-.drawer-tag-cloud{padding:4px 12px 8px;display:flex;flex-wrap:wrap;gap:6px;}
-.drawer-footer{
-  flex-shrink:0;padding:12px 16px;border-top:1px solid var(--border);
-  display:flex;flex-direction:column;gap:8px;
-}
-.drawer-sync-btn{
-  width:100%;background:var(--bg3);border:1px solid var(--border);
-  color:var(--text2);font-family:var(--mono);font-size:12px;
-  padding:10px;border-radius:var(--r);cursor:pointer;transition:all .1s;
-}
-.drawer-sync-btn:hover{background:var(--bg4);color:var(--text);}
-.hamburger{
-  display:none;flex-shrink:0;
-  background:#1a1d23;border:none;
-  color:#fff;padding:6px 10px;border-radius:var(--r);
-  cursor:pointer;font-size:18px;line-height:1;transition:all .1s;
-}
-.hamburger:hover{background:#2d3142;}
-
-/* ═══ RESPONSIVE ═══ */
+/* RESPONSIVE */
 @media(max-width:640px){
   .sidebar{display:none;}
-  .bottom-nav{display:none;}
   .hamburger{display:flex;align-items:center;}
-  .header-btn:not(.primary){display:none;}
-  .search-wrap{min-width:0;flex:1;}
-  .search-wrap input{min-width:0;width:100%;}
   .logo{display:none;}
+  .search-wrap{min-width:0;flex:1;}
+  .header-btn:not(.primary){display:none;}
   .form-row-2{grid-template-columns:1fr;}
   .card-actions .ic-btn:not(.copy-btn){display:none;}
   .cards{padding:10px 12px;}
   .toast{bottom:24px;}
 }
 @media(min-width:641px){
-  .bottom-nav{display:none;}
-  .hamburger{display:none;}
   .drawer,.drawer-overlay{display:none !important;}
+  .hamburger{display:none;}
   .overlay{align-items:center;}
   .modal{border-radius:16px;margin:16px;box-shadow:var(--shadow-md);}
   .modal-bar{display:none;}
@@ -471,28 +218,21 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 </head>
 <body>
 <div class="app">
-
-  <!-- HEADER -->
   <div class="header">
-    <button class="hamburger" onclick="openDrawer()" aria-label="メニュー">☰</button>
+    <button class="hamburger" id="hamburgerBtn">☰</button>
     <div class="logo">PM<em>/</em>AI</div>
     <div class="search-wrap">
       <span class="search-icon">⌕</span>
       <input type="search" id="searchInput" placeholder="検索…" oninput="renderCards()">
     </div>
-    <button class="header-btn sp-show" onclick="openSetup()" title="設定">⚙</button>
+    <button class="header-btn" onclick="openSetup()">⚙</button>
     <button class="header-btn primary" onclick="openAdd()">＋ 追加</button>
   </div>
-
-  <!-- SYNC STATUS -->
   <div class="sync-status" id="syncStatus">
     <div class="sync-dot" id="syncDot"></div>
     <span id="syncMsg">Google Sheets未接続 — <a href="#" onclick="openSetup();return false;" style="color:var(--text2)">設定する</a></span>
   </div>
-
   <div class="body">
-
-    <!-- SIDEBAR (PC) -->
     <div class="sidebar">
       <div class="sb-section">
         <div class="sb-label">モデル</div>
@@ -504,14 +244,12 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
       </div>
       <div class="sb-section">
         <div class="sb-label">絞り込み</div>
-        <div class="sb-item" id="starFilter" onclick="toggleStar(this)"><span style="font-size:13px">★</span>お気に入り</div>
+        <div class="sb-item" id="starFilterBtn" onclick="toggleStar(this)"><span style="font-size:13px">★</span>お気に入り</div>
       </div>
       <div class="sb-section" style="padding:0 14px;">
         <button class="sync-btn" onclick="syncFromSheets()" style="width:100%">↻ 同期</button>
       </div>
     </div>
-
-    <!-- MAIN -->
     <div class="main">
       <div class="toolbar">
         <select class="sort-sel" onchange="renderCards()">
@@ -526,47 +264,45 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
       <div class="cards" id="cardsGrid"></div>
     </div>
   </div>
-
 </div>
 
-<!-- DRAWER OVERLAY & DRAWER (SP) -->
-<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()" style="display:none"></div>
-<div class="drawer" id="drawer" style="display:none">
+<!-- DRAWER -->
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<div class="drawer" id="drawer">
   <div class="drawer-header">
-    <span class="drawer-title">PM<em style="color:var(--border2);font-style:normal">/</em>AI</span>
-    <button class="drawer-close" onclick="closeDrawer()">×</button>
+    <span class="drawer-title">MENU</span>
+    <button class="drawer-close" id="drawerCloseBtn">×</button>
   </div>
   <div class="drawer-body">
-    <div class="drawer-section">
-      <div class="drawer-label">モデル</div>
-      <div id="drawerModels"></div>
-    </div>
-    <div class="drawer-section">
-      <div class="drawer-label">タグ</div>
-      <div class="drawer-tag-cloud" id="drawerTagCloud"></div>
-    </div>
-    <div class="drawer-section">
-      <div class="drawer-label">絞り込み</div>
-      <div class="drawer-item" id="drawerStarFilter" onclick="toggleStarDrawer()">
-        <span style="font-size:16px;color:var(--warn)">★</span>
-        お気に入りのみ
-        <span id="drawerStarBadge" style="display:none;margin-left:auto;font-size:10px;background:var(--warn);color:#fff;padding:1px 7px;border-radius:8px;font-family:var(--mono)">ON</span>
-      </div>
-    </div>
+    <div class="drawer-label">モデル</div>
+    <div id="drawerModels"></div>
+    <div class="drawer-label" style="margin-top:12px">タグ</div>
+    <div class="drawer-tag-cloud" id="drawerTagCloud"></div>
+    <div class="drawer-label" style="margin-top:12px">絞り込み</div>
+    <div class="drawer-item" id="drawerStarItem"><span style="font-size:16px;color:var(--warn)">★</span>お気に入り<span id="drawerStarBadge" style="display:none;margin-left:auto;font-size:10px;background:var(--warn);color:#fff;padding:1px 7px;border-radius:8px;font-family:var(--mono)">ON</span></div>
   </div>
   <div class="drawer-footer">
-    <button class="drawer-sync-btn" onclick="syncFromSheets();closeDrawer()">↻ Sheetsと同期</button>
-    <button class="drawer-sync-btn" onclick="openSetup();closeDrawer()">⚙ 設定</button>
+    <button class="drawer-sync-btn" id="drawerSyncBtn">↻ Sheetsと同期</button>
+    <button class="drawer-sync-btn" id="drawerSetupBtn">⚙ 設定</button>
   </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox">
+  <button class="lb-close" id="lbClose">×</button>
+  <button class="lb-nav lb-prev" id="lbPrev">‹</button>
+  <img id="lightboxImg" src="" alt="">
+  <button class="lb-nav lb-next" id="lbNext">›</button>
+  <div class="lb-counter" id="lbCounter"></div>
 </div>
 
 <!-- EDIT MODAL -->
-<div class="overlay" id="editOverlay" onclick="bgClose(event,'editOverlay')">
+<div class="overlay" id="editOverlay">
   <div class="modal">
     <div class="modal-bar"></div>
     <div class="modal-head">
       <span class="modal-ttl" id="editTitle">プロンプトを追加</span>
-      <button class="modal-x" onclick="closeModal('editOverlay')">×</button>
+      <button class="modal-x" id="editCloseBtn">×</button>
     </div>
     <div class="modal-body">
       <div class="form-row-2">
@@ -610,42 +346,40 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
       </div>
       <div class="form-row">
         <label class="form-label">画像（最大5枚）</label>
-        <div class="img-upload-area" id="imgUploadArea"
-          ondragover="dragOver(event)" ondragleave="dragLeave(event)" ondrop="dropImage(event)"
-          onclick="document.getElementById('imgFileInput').click()">
+        <div class="img-upload-area" id="imgUploadArea">
           <div>📎 タップまたはドラッグで画像を追加</div>
           <div style="font-size:11px;margin-top:4px;font-family:var(--mono)">JPG / PNG / WebP・1枚あたり5MB以下</div>
-          <input type="file" id="imgFileInput" accept="image/*" multiple onchange="handleImageFiles(event)">
+          <input type="file" id="imgFileInput" accept="image/*" multiple style="display:none">
         </div>
         <div class="img-preview-grid" id="imgPreviewGrid"></div>
       </div>
       <div class="form-row">
         <label class="form-label">引用元URL</label>
         <div style="display:flex;gap:8px;align-items:center;">
-          <input class="form-input" id="fSourceUrl" placeholder="https://…" style="flex:1;" oninput="onUrlInput()">
-          <button class="btn btn-sec" id="fetchTitleBtn" onclick="fetchPageTitle()" style="white-space:nowrap;flex-shrink:0;font-size:11px;padding:10px 12px;">タイトル取得</button>
+          <input class="form-input" id="fSourceUrl" placeholder="https://…" style="flex:1;">
+          <button class="btn btn-sec" id="fetchTitleBtn" style="white-space:nowrap;flex-shrink:0;font-size:11px;padding:10px 12px;">タイトル取得</button>
         </div>
       </div>
-      <div class="form-row" id="sourceTitleRow">
+      <div class="form-row">
         <label class="form-label">ページタイトル</label>
         <input class="form-input" id="fSourceTitle" placeholder="URLからの自動取得 または 手動入力">
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-del" id="delBtn" style="display:none" onclick="delPrompt()">削除</button>
-      <button class="btn btn-sec" onclick="closeModal('editOverlay')">キャンセル</button>
-      <button class="btn btn-primary" onclick="savePrompt()">保存</button>
+      <button class="btn btn-del" id="delBtn" style="display:none">削除</button>
+      <button class="btn btn-sec" id="editCancelBtn">キャンセル</button>
+      <button class="btn btn-primary" id="editSaveBtn">保存</button>
     </div>
   </div>
 </div>
 
 <!-- DETAIL MODAL -->
-<div class="overlay" id="detailOverlay" onclick="bgClose(event,'detailOverlay')">
+<div class="overlay" id="detailOverlay">
   <div class="modal">
     <div class="modal-bar"></div>
     <div class="modal-head">
       <span class="modal-ttl" id="dtTitle">—</span>
-      <button class="modal-x" onclick="closeModal('detailOverlay')">×</button>
+      <button class="modal-x" id="detailCloseBtn">×</button>
     </div>
     <div class="detail-body">
       <div class="detail-meta" id="dtMeta"></div>
@@ -654,32 +388,33 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
         <div class="form-label" style="margin-bottom:5px">メモ</div>
         <div style="font-size:13px;color:var(--text2)" id="dtNote"></div>
       </div>
-    </div>
-    <div id="dtImagesWrap" style="display:none">
-      <div class="form-label" style="margin-bottom:8px">添付画像</div>
-      <div class="img-preview-grid" id="dtImages"></div>
+      <div id="dtImagesWrap" style="display:none">
+        <div class="form-label" style="margin-bottom:8px">添付画像</div>
+        <div class="img-preview-grid" id="dtImages"></div>
+      </div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-sec" onclick="editFromDetail()">編集</button>
-      <button class="btn btn-primary" onclick="copyFromDetail()">コピー</button>
+      <button class="btn btn-sec" id="detailEditBtn">編集</button>
+      <button class="btn btn-primary" id="detailCopyBtn">コピー</button>
     </div>
   </div>
 </div>
 
 <!-- SETUP MODAL -->
-<div class="overlay" id="setupOverlay" onclick="bgClose(event,'setupOverlay')">
+<div class="overlay" id="setupOverlay">
   <div class="modal">
     <div class="modal-bar"></div>
     <div class="modal-head">
       <span class="modal-ttl">Google Sheets 接続設定</span>
-      <button class="modal-x" onclick="closeModal('setupOverlay')">×</button>
+      <button class="modal-x" id="setupCloseBtn">×</button>
     </div>
     <div class="modal-body">
       <div class="setup-box">
-        <p>Google Apps Script (GAS) をデプロイして取得した<strong style="color:var(--text)">ウェブアプリURL</strong>を貼り付けてください。</p>
+        <p>Google Apps Script をデプロイして取得した<strong style="color:var(--text)">ウェブアプリURL</strong>を入力してください。</p>
         <ol>
           <li>Googleスプレッドシートを新規作成</li>
           <li>拡張機能 → Apps Script → <code>gas-code.gs</code>を貼り付け保存</li>
+          <li>左メニュー「サービス」→ <code>Drive API</code> を追加（v3）</li>
           <li>デプロイ → 新しいデプロイ → 種類:ウェブアプリ</li>
           <li>実行者:自分 / アクセス:<strong style="color:var(--text)">全員</strong></li>
           <li>URLをコピーして下に貼り付け</li>
@@ -693,38 +428,26 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
       <div style="border-top:1px solid var(--border);padding-top:14px;margin-top:2px;">
         <div class="form-label" style="margin-bottom:10px">バックアップ（緊急用）</div>
         <div style="display:flex;gap:8px;">
-          <button class="btn btn-sec" style="flex:1;font-size:11px;" onclick="exportJSON()">↓ JSONエクスポート</button>
-          <label class="btn btn-sec" style="flex:1;font-size:11px;text-align:center;cursor:pointer;">
-            ↑ JSONインポート
-            <input type="file" accept=".json" style="display:none" onchange="importJSON(event)">
-          </label>
+          <button class="btn btn-sec" style="flex:1;font-size:11px;" id="exportBtn">↓ JSONエクスポート</button>
+          <label class="btn btn-sec" style="flex:1;font-size:11px;text-align:center;cursor:pointer;">↑ JSONインポート<input type="file" accept=".json" style="display:none" id="importFile"></label>
         </div>
-        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:8px;line-height:1.6;">Sheets障害・オフライン時のデータ移行用。通常操作では不要。</div>
+        <div style="font-family:var(--mono);font-size:10px;color:var(--text3);margin-top:8px;line-height:1.6;">Sheets障害・オフライン時のデータ移行用。</div>
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-sec" onclick="testConnection()">接続テスト</button>
-      <button class="btn btn-primary" onclick="saveSetup()">保存して同期</button>
+      <button class="btn btn-sec" id="testConnBtn">接続テスト</button>
+      <button class="btn btn-primary" id="setupSaveBtn">保存して同期</button>
     </div>
   </div>
 </div>
 
-<!-- LIGHTBOX -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <button class="lightbox-close" onclick="closeLightbox()">×</button>
-  <button class="lightbox-nav lightbox-prev" onclick="lbNav(-1);event.stopPropagation()">‹</button>
-  <img id="lightboxImg" src="" alt="">
-  <button class="lightbox-nav lightbox-next" onclick="lbNav(1);event.stopPropagation()">›</button>
-  <div class="lightbox-counter" id="lbCounter"></div>
-</div>
-
 <!-- ADD MODEL MODAL -->
-<div class="overlay" id="addModelOverlay" onclick="bgClose(event,'addModelOverlay')">
+<div class="overlay" id="addModelOverlay">
   <div class="modal">
     <div class="modal-bar"></div>
     <div class="modal-head">
       <span class="modal-ttl">モデルを追加</span>
-      <button class="modal-x" onclick="closeModal('addModelOverlay')">×</button>
+      <button class="modal-x" id="addModelCloseBtn">×</button>
     </div>
     <div class="modal-body">
       <div class="form-row">
@@ -740,8 +463,8 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
       </div>
     </div>
     <div class="modal-foot">
-      <button class="btn btn-sec" onclick="closeModal('addModelOverlay')">キャンセル</button>
-      <button class="btn btn-primary" onclick="saveCustomModel()">追加</button>
+      <button class="btn btn-sec" id="addModelCancelBtn">キャンセル</button>
+      <button class="btn btn-primary" id="addModelSaveBtn">追加</button>
     </div>
   </div>
 </div>
@@ -749,79 +472,120 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--s
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════
-const LS = 'pm_v3'; const LS_URL = 'pm_gas_url'; const LS_MODELS = 'pm_models';
+// ═══ STATE ═══════════════════════════════════════════════
+const LS='pm_v3',LS_URL='pm_gas_url',LS_MODELS='pm_models';
+let prompts=[],gasUrl='',customModels=[];
+let activeModel='all',activeTag=null,starOnly=false;
+let editId=null,detailId=null;
+let editImages=[],lbImages=[],lbIndex=0;
+const MAX_IMAGES=5,MAX_SIZE=5*1024*1024;
 
-// 組み込みモデル定義
-const BUILTIN_MODELS = [
-  {id:'claude',    label:'Claude',      color:'#d97757'},
-  {id:'gemini',    label:'Gemini',      color:'#4285f4'},
-  {id:'chatgpt',   label:'ChatGPT',     color:'#10a37f'},
-  {id:'grok',      label:'Grok',        color:'#ff4b4b'},
-  {id:'perplexity',label:'Perplexity',  color:'#20b2aa'},
-  {id:'copilot',   label:'Copilot',     color:'#0078d4'},
-  {id:'claudecode',label:'Claude Code', color:'#b084f5'},
+const BUILTIN_MODELS=[
+  {id:'claude',    label:'Claude',      color:'#c4633a'},
+  {id:'gemini',    label:'Gemini',      color:'#1a73e8'},
+  {id:'chatgpt',   label:'ChatGPT',     color:'#0a7c5c'},
+  {id:'grok',      label:'Grok',        color:'#c41e1e'},
+  {id:'perplexity',label:'Perplexity',  color:'#0d7b74'},
+  {id:'copilot',   label:'Copilot',     color:'#0065bd'},
+  {id:'claudecode',label:'Claude Code', color:'#7c3aed'},
 ];
-let customModels = []; // {id, label, color}
-// 画像アップロード用state
-let editImages = []; // [{fileId, url, uploading}]
-let lbImages   = []; // ライトボックス用URL配列
-let lbIndex    = 0;
-function allModels(){ return [...BUILTIN_MODELS, ...customModels]; }
-function modelLabel(id){ return (allModels().find(m=>m.id===id)||{label:id}).label; }
-function modelColor(id){ return (allModels().find(m=>m.id===id)||{color:'#888'}).color; }
-function badgeClass(id){
-  const builtins=['claude','gemini','chatgpt','grok','perplexity','copilot','claudecode'];
-  return builtins.includes(id)?'b-'+id:'b-custom';
-}
-let prompts = [];
-let gasUrl = '';
-let activeModel = 'all';
-let activeTag = null;
-let starOnly = false;
-let editId = null;
-let detailId = null;
-
-const SAMPLES = [
-  {id:uid(),model:'claude',title:'戦略アドバイザー人格設定',category:'システム',prompt:'あなたは私の「最高峰の戦略アドバイザー」です。\n論理的・客観的・戦略的な視点から、私の思考の盲点を指摘してください。\n\n# 行動指針\n- 結論から述べる\n- 常に複数の選択肢を提示する\n- 一般論でお茶を濁さない\n\n# 禁止事項\n- 「素晴らしい考えですね」等の無意味な称賛\n- 一般論での水増し',tags:['システム','人格設定','戦略'],rating:5,starred:true,note:'Claude専用ベース設定',createdAt:Date.now()-864e5*3,updatedAt:Date.now()-864e5*3},
-  {id:uid(),model:'chatgpt',title:'SEO記事構成生成',category:'コンテンツ',prompt:'以下のキーワードでSEOに強い記事構成を作成してください。\n\nキーワード：{{キーワード}}\nターゲット：{{ターゲット読者}}\n文字数目安：{{文字数}}文字\n\n出力形式：\n1. タイトル案（3つ）\n2. メタディスクリプション\n3. H2見出し構成（6〜8項目）\n4. 各H2の要点（2〜3行）',tags:['SEO','コンテンツ','記事'],rating:4,starred:false,note:'{{}}内を置換して使用',createdAt:Date.now()-864e5*2,updatedAt:Date.now()-864e5*2},
-  {id:uid(),model:'gemini',title:'データ分析レポート要約',category:'分析',prompt:'以下のデータを分析し、経営者向けに要約してください。\n\n【要求形式】\n- エグゼクティブサマリー（3行以内）\n- 主要な発見事項（箇条書き5点）\n- リスク・課題（2〜3点）\n- 推奨アクション（優先順位付き）',tags:['分析','レポート','要約'],rating:4,starred:false,note:'Geminiのドキュメント読み込みと組み合わせると強力',createdAt:Date.now()-864e5,updatedAt:Date.now()-864e5},
+const SAMPLES=[
+  {id:uid(),model:'claude',title:'戦略アドバイザー人格設定',category:'システム',prompt:'あなたは私の「最高峰の戦略アドバイザー」です。\n論理的・客観的・戦略的な視点から、私の思考の盲点を指摘してください。\n\n# 行動指針\n- 結論から述べる\n- 常に複数の選択肢を提示する\n- 一般論でお茶を濁さない',tags:['システム','戦略'],rating:5,starred:true,note:'Claude専用ベース設定',sourceUrl:'',sourceTitle:'',imageIds:[],createdAt:Date.now()-864e5*3,updatedAt:Date.now()-864e5*3},
+  {id:uid(),model:'chatgpt',title:'SEO記事構成生成',category:'コンテンツ',prompt:'以下のキーワードでSEOに強い記事構成を作成してください。\n\nキーワード：{{キーワード}}\nターゲット：{{ターゲット読者}}',tags:['SEO','コンテンツ'],rating:4,starred:false,note:'{{}}内を置換して使用',sourceUrl:'',sourceTitle:'',imageIds:[],createdAt:Date.now()-864e5*2,updatedAt:Date.now()-864e5*2},
+  {id:uid(),model:'gemini',title:'データ分析レポート要約',category:'分析',prompt:'以下のデータを分析し、経営者向けに要約してください。\n\n- エグゼクティブサマリー（3行以内）\n- 主要な発見事項（5点）\n- 推奨アクション（優先順位付き）',tags:['分析','レポート'],rating:4,starred:false,note:'',sourceUrl:'',sourceTitle:'',imageIds:[],createdAt:Date.now()-864e5,updatedAt:Date.now()-864e5},
 ];
 
 function uid(){return Math.random().toString(36).slice(2,9)+Date.now().toString(36);}
+function allModels(){return[...BUILTIN_MODELS,...customModels];}
+function modelLabel(id){return(allModels().find(m=>m.id===id)||{label:id}).label;}
+function modelColor(id){return(allModels().find(m=>m.id===id)||{color:'#888'}).color;}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+function fmtDate(ts){const d=new Date(ts);return d.getFullYear()+'/'+(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0');}
 
-// ═══════════════════════════════════════════════════════
-//  INIT
-// ═══════════════════════════════════════════════════════
+// ═══ INIT ════════════════════════════════════════════════
 function init(){
-  try{const d=localStorage.getItem(LS);prompts=d?JSON.parse(d):SAMPLES;}
-  catch{prompts=SAMPLES;}
-  try{const m=localStorage.getItem(LS_MODELS);customModels=m?JSON.parse(m):[];}
-  catch{customModels=[];}
+  try{const d=localStorage.getItem(LS);prompts=d?JSON.parse(d):SAMPLES;}catch{prompts=SAMPLES;}
+  try{const m=localStorage.getItem(LS_MODELS);customModels=m?JSON.parse(m):[];}catch{customModels=[];}
   gasUrl=localStorage.getItem(LS_URL)||'';
   if(gasUrl)setSyncStatus('ok','接続済み — '+gasUrl.slice(0,40)+'…');
+  bindEvents();
   renderModelUI();
   renderCards();
 }
-
 function saveLocal(){localStorage.setItem(LS,JSON.stringify(prompts));}
 
-// ═══════════════════════════════════════════════════════
-//  SYNC STATUS
-// ═══════════════════════════════════════════════════════
-function setSyncStatus(state,msg){
-  const dot=document.getElementById('syncDot');
-  const txt=document.getElementById('syncMsg');
-  dot.className='sync-dot'+(state?' '+state:'');
-  txt.innerHTML=msg;
+// ═══ EVENT BINDING ═══════════════════════════════════════
+function bindEvents(){
+  // Hamburger
+  document.getElementById('hamburgerBtn').addEventListener('click',openDrawer);
+  document.getElementById('drawerCloseBtn').addEventListener('click',closeDrawer);
+  document.getElementById('drawerOverlay').addEventListener('click',closeDrawer);
+  document.getElementById('drawerStarItem').addEventListener('click',function(){starOnly=!starOnly;closeDrawer();renderCards();});
+  document.getElementById('drawerSyncBtn').addEventListener('click',function(){syncFromSheets();closeDrawer();});
+  document.getElementById('drawerSetupBtn').addEventListener('click',function(){openSetup();closeDrawer();});
+  // Edit modal
+  document.getElementById('editCloseBtn').addEventListener('click',function(){closeModal('editOverlay');});
+  document.getElementById('editCancelBtn').addEventListener('click',function(){closeModal('editOverlay');});
+  document.getElementById('editSaveBtn').addEventListener('click',savePrompt);
+  document.getElementById('delBtn').addEventListener('click',delPrompt);
+  // Detail modal
+  document.getElementById('detailCloseBtn').addEventListener('click',function(){closeModal('detailOverlay');});
+  document.getElementById('detailEditBtn').addEventListener('click',editFromDetail);
+  document.getElementById('detailCopyBtn').addEventListener('click',copyFromDetail);
+  // Setup modal
+  document.getElementById('setupCloseBtn').addEventListener('click',function(){closeModal('setupOverlay');});
+  document.getElementById('testConnBtn').addEventListener('click',testConnection);
+  document.getElementById('setupSaveBtn').addEventListener('click',saveSetup);
+  document.getElementById('exportBtn').addEventListener('click',exportJSON);
+  document.getElementById('importFile').addEventListener('change',importJSON);
+  // Add model modal
+  document.getElementById('addModelCloseBtn').addEventListener('click',function(){closeModal('addModelOverlay');});
+  document.getElementById('addModelCancelBtn').addEventListener('click',function(){closeModal('addModelOverlay');});
+  document.getElementById('addModelSaveBtn').addEventListener('click',saveCustomModel);
+  // Overlay bg click
+  ['editOverlay','detailOverlay','setupOverlay','addModelOverlay'].forEach(id=>{
+    document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeModal(id);});
+  });
+  // Image upload
+  document.getElementById('imgUploadArea').addEventListener('click',function(){document.getElementById('imgFileInput').click();});
+  document.getElementById('imgFileInput').addEventListener('change',handleImageFiles);
+  document.getElementById('imgUploadArea').addEventListener('dragover',function(e){e.preventDefault();this.classList.add('drag');});
+  document.getElementById('imgUploadArea').addEventListener('dragleave',function(){this.classList.remove('drag');});
+  document.getElementById('imgUploadArea').addEventListener('drop',dropImage);
+  // Fetch title
+  document.getElementById('fetchTitleBtn').addEventListener('click',fetchPageTitle);
+  // Lightbox
+  document.getElementById('lbClose').addEventListener('click',closeLightbox);
+  document.getElementById('lbPrev').addEventListener('click',function(e){e.stopPropagation();lbNav(-1);});
+  document.getElementById('lbNext').addEventListener('click',function(e){e.stopPropagation();lbNav(1);});
+  document.getElementById('lightbox').addEventListener('click',closeLightbox);
+  // Keyboard
+  document.addEventListener('keydown',function(e){
+    if(e.key==='Escape'){['editOverlay','detailOverlay','setupOverlay','addModelOverlay'].forEach(id=>closeModal(id));closeDrawer();closeLightbox();}
+    if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.getElementById('searchInput').focus();}
+  });
 }
 
-// ═══════════════════════════════════════════════════════
-//  GOOGLE SHEETS API
-// ═══════════════════════════════════════════════════════
-async function gasGet(params={}){
+// ═══ DRAWER ══════════════════════════════════════════════
+function openDrawer(){
+  document.getElementById('drawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeDrawer(){
+  document.getElementById('drawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+
+// ═══ SYNC STATUS ═════════════════════════════════════════
+function setSyncStatus(state,msg){
+  document.getElementById('syncDot').className='sync-dot'+(state?' '+state:'');
+  document.getElementById('syncMsg').innerHTML=msg;
+}
+
+// ═══ GAS API ═════════════════════════════════════════════
+async function gasGet(params){
   if(!gasUrl)throw new Error('GAS URL未設定');
   const q=new URLSearchParams({action:'getAll',...params});
   const r=await fetch(gasUrl+'?'+q);
@@ -830,30 +594,18 @@ async function gasGet(params={}){
 }
 async function gasPost(body){
   if(!gasUrl)throw new Error('GAS URL未設定');
-  // Android Chrome対応: no-corsモードで送信
-  // レスポンスは読めないがGAS側への書き込みは成功する
   try{
-    await fetch(gasUrl,{
-      method:'POST',
-      mode:'no-cors',
-      headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify(body)
-    });
-    return {ok:true};
-  }catch(e){
-    throw new Error(e.message);
-  }
+    await fetch(gasUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(body)});
+    return{ok:true};
+  }catch(e){throw new Error(e.message);}
 }
-
 async function syncFromSheets(){
   if(!gasUrl){openSetup();return;}
   setSyncStatus('loading','同期中…');
-  const btn=document.querySelector('.sync-btn');
   try{
-    const res=await gasGet();
+    const res=await gasGet({action:'getAll'});
     if(!res.ok)throw new Error(res.error);
     if(res.data.length>0){
-      // Sheetsのデータを正とする（マージ：IDで重複排除）
       const remote=res.data;
       const localOnly=prompts.filter(p=>!remote.find(r=>r.id===p.id));
       prompts=[...remote,...localOnly];
@@ -867,165 +619,64 @@ async function syncFromSheets(){
     toast('同期失敗: '+e.message);
   }
 }
-
 async function pushToSheets(action,payload){
   if(!gasUrl)return;
   try{
     await gasPost({action,payload});
     setSyncStatus('ok','保存済み — '+new Date().toLocaleTimeString('ja-JP'));
   }catch(e){
-    console.warn('Sheets push failed:',e.message);
-    setSyncStatus('err','保存失敗 — 手動同期してください');
+    setSyncStatus('err','自動保存失敗');
   }
 }
 
-// ═══════════════════════════════════════════════════════
-//  IMAGE UPLOAD
-// ═══════════════════════════════════════════════════════
-const MAX_IMAGES = 5;
-const MAX_SIZE   = 5 * 1024 * 1024; // 5MB
-
-function renderImgPreview(){
-  const grid = document.getElementById('imgPreviewGrid');
-  if(!grid) return;
-  grid.innerHTML = editImages.map((img,i) => `
-    <div class="img-thumb" id="imgthumb-${i}">
-      ${img.url ? `<img src="${img.url}" onerror="this.src=''">` : ''}
-      ${img.uploading ? `<div class="img-uploading">↑</div>` : ''}
-      ${!img.uploading ? `<button class="img-thumb-del" onclick="removeImg(${i})">×</button>` : ''}
-    </div>`).join('');
-  // アップロード枠の表示切替
-  const area = document.getElementById('imgUploadArea');
-  if(area) area.style.display = editImages.length >= MAX_IMAGES ? 'none' : 'block';
-}
-
-async function handleImageFiles(e){
-  const files = Array.from(e.target.files);
-  e.target.value = '';
-  for(const file of files){
-    if(editImages.length >= MAX_IMAGES){ toast('画像は最大'+MAX_IMAGES+'枚です'); break; }
-    if(file.size > MAX_SIZE){ toast(file.name+' はサイズ超過（5MB以下）'); continue; }
-    await uploadImageFile(file);
-  }
-}
-
-function dragOver(e){ e.preventDefault(); document.getElementById('imgUploadArea').classList.add('drag'); }
-function dragLeave(e){ document.getElementById('imgUploadArea').classList.remove('drag'); }
-async function dropImage(e){
-  e.preventDefault();
-  document.getElementById('imgUploadArea').classList.remove('drag');
-  const files = Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
-  for(const file of files){
-    if(editImages.length >= MAX_IMAGES){ toast('画像は最大'+MAX_IMAGES+'枚です'); break; }
-    if(file.size > MAX_SIZE){ toast(file.name+' はサイズ超過（5MB以下）'); continue; }
-    await uploadImageFile(file);
-  }
-}
-
-async function uploadImageFile(file){
-  if(!gasUrl){ toast('先にGAS URLを設定してください'); return; }
-  // プレビュー用ローカルURL
-  const localUrl = URL.createObjectURL(file);
-  const idx = editImages.length;
-  editImages.push({ fileId:'', url:localUrl, uploading:true });
-  renderImgPreview();
-  try{
-    const base64 = await fileToBase64(file);
-    const res = await gasPost({
-      action: 'uploadImage',
-      payload: { base64, mimeType: file.type, fileName: file.name }
+// ═══ MODEL UI ════════════════════════════════════════════
+function renderModelUI(){
+  const models=allModels();
+  const makeItems=(itemCls,cntCls,onClick)=>{
+    let h=`<div class="${itemCls}${activeModel==='all'?' active':''}" style="${activeModel==='all'?'border-left-color:var(--text2);':''}" data-model="all">
+      <div class="dot" style="background:var(--text3)"></div>すべて<span class="${cntCls}">${prompts.length}</span></div>`;
+    models.forEach(m=>{
+      const cnt=prompts.filter(p=>p.model===m.id).length;
+      const act=activeModel===m.id;
+      h+=`<div class="${itemCls}${act?' active':''}" style="${act?'border-left-color:'+m.color+';color:'+m.color+';':''}" data-model="${m.id}">
+        <div class="dot" style="background:${m.color}"></div>${esc(m.label)}<span class="${cntCls}">${cnt}</span></div>`;
     });
-    if(res && res.ok){
-      editImages[idx] = { fileId: res.fileId, url: res.url, uploading: false };
-    } else {
-      editImages.splice(idx, 1);
-      toast('アップロード失敗: '+(res&&res.error||'不明'));
-    }
-  }catch(e){
-    editImages.splice(idx, 1);
-    toast('アップロードエラー: '+e.message);
+    h+=`<div class="${itemCls}" style="color:var(--text3);font-size:12px;" data-action="addmodel">
+      <div class="dot" style="border:1.5px dashed var(--text3);border-radius:50%;"></div>＋ モデルを追加</div>`;
+    return h;
+  };
+  const sb=document.getElementById('sidebarModels');
+  if(sb){
+    sb.innerHTML=makeItems('sb-item','sb-count');
+    sb.querySelectorAll('[data-model]').forEach(el=>{
+      el.addEventListener('click',function(){selModel(this.dataset.model);});
+    });
+    sb.querySelector('[data-action="addmodel"]').addEventListener('click',openAddModel);
   }
-  renderImgPreview();
-}
-
-function fileToBase64(file){
-  return new Promise((res,rej)=>{
-    const r = new FileReader();
-    r.onload = e => res(e.target.result.split(',')[1]);
-    r.onerror = rej;
-    r.readAsDataURL(file);
-  });
-}
-
-async function removeImg(i){
-  const img = editImages[i];
-  if(img && img.fileId && gasUrl){
-    gasPost({ action:'deleteImage', payload:{ fileId: img.fileId } });
+  const dm=document.getElementById('drawerModels');
+  if(dm){
+    dm.innerHTML=makeItems('drawer-item','drawer-count');
+    dm.querySelectorAll('[data-model]').forEach(el=>{
+      el.addEventListener('click',function(){selModel(this.dataset.model);});
+    });
+    dm.querySelector('[data-action="addmodel"]').addEventListener('click',function(){openAddModel();closeDrawer();});
   }
-  editImages.splice(i, 1);
-  renderImgPreview();
-}
-
-// LIGHTBOX
-function openLightbox(promptId, startIdx){
-  const p = prompts.find(x=>x.id===promptId);
-  if(!p||!p.imageIds||!p.imageIds.length) return;
-  lbImages = p.imageIds.map(fid=>'https://drive.google.com/uc?export=view&id='+fid);
-  lbIndex  = startIdx || 0;
-  showLbImage();
-  document.getElementById('lightbox').classList.add('open');
-}
-function closeLightbox(){
-  document.getElementById('lightbox').classList.remove('open');
-}
-function lbNav(dir){
-  lbIndex = (lbIndex + dir + lbImages.length) % lbImages.length;
-  showLbImage();
-}
-function showLbImage(){
-  document.getElementById('lightboxImg').src = lbImages[lbIndex];
-  document.getElementById('lbCounter').textContent =
-    lbImages.length > 1 ? (lbIndex+1)+' / '+lbImages.length : '';
-  // ナビボタン表示切替
-  document.querySelector('.lightbox-prev').style.display = lbImages.length>1?'flex':'none';
-  document.querySelector('.lightbox-next').style.display = lbImages.length>1?'flex':'none';
-}
-
-// ═══════════════════════════════════════════════════════
-//  PAGE TITLE FETCH
-// ═══════════════════════════════════════════════════════
-function onUrlInput(){
-  const url=document.getElementById('fSourceUrl').value.trim();
-  const btn=document.getElementById('fetchTitleBtn');
-  btn.style.opacity=url?'1':'0.4';
-}
-async function fetchPageTitle(){
-  if(!gasUrl){toast('先にGAS URLを設定してください');return;}
-  const url=document.getElementById('fSourceUrl').value.trim();
-  if(!url){toast('URLを入力してください');return;}
-  const btn=document.getElementById('fetchTitleBtn');
-  btn.textContent='取得中…';btn.disabled=true;
-  try{
-    const r=await fetch(gasUrl+'?action=fetchTitle&url='+encodeURIComponent(url));
-    const d=await r.json();
-    if(d.ok&&d.title){
-      document.getElementById('fSourceTitle').value=d.title;
-      toast('タイトルを取得しました');
-    }else{
-      toast('取得失敗: '+(d.error||'不明なエラー'));
-    }
-  }catch(e){
-    toast('通信エラー: '+e.message);
-  }finally{
-    btn.textContent='タイトル取得';btn.disabled=false;
+  // star badge
+  const dsb=document.getElementById('drawerStarBadge');
+  if(dsb)dsb.style.display=starOnly?'inline':'none';
+  const sfb=document.getElementById('starFilterBtn');
+  if(sfb)sfb.classList.toggle('active',starOnly);
+  // form model select
+  const fm=document.getElementById('fModel');
+  if(fm){
+    const cur=fm.value;
+    fm.innerHTML=models.map(m=>`<option value="${m.id}">${esc(m.label)}</option>`).join('');
+    if(cur)fm.value=cur;
   }
 }
 
-// ═══════════════════════════════════════════════════════
-//  MODEL / TAG FILTER
-// ═══════════════════════════════════════════════════════
 function selModel(m){
-  activeModel=m;
+  if(m==='all'||m)activeModel=m;
   closeDrawer();
   renderCards();
 }
@@ -1034,19 +685,26 @@ function toggleStar(el){
   el.classList.toggle('active',starOnly);
   renderCards();
 }
-function toggleStarDrawer(){
-  starOnly=!starOnly;
-  renderCards();
-  closeDrawer();
-}
-function filterTag(t){
-  activeTag=activeTag===t?null:t;
-  renderCards();
-}
 
-// ═══════════════════════════════════════════════════════
-//  RENDER
-// ═══════════════════════════════════════════════════════
+// ═══ TAGS ════════════════════════════════════════════════
+function updateTags(){
+  const freq={};
+  prompts.forEach(p=>(p.tags||[]).forEach(t=>{freq[t]=(freq[t]||0)+1;}));
+  const makeChips=(onclick)=>Object.entries(freq).sort((a,b)=>b[1]-a[1]).map(([t])=>{
+    const chip=document.createElement('button');
+    chip.className='tag-chip'+(activeTag===t?' active':'');
+    chip.textContent='#'+t;
+    chip.addEventListener('click',function(){filterTag(t);if(onclick)onclick();});
+    return chip;
+  });
+  const tc=document.getElementById('tagCloud');
+  if(tc){tc.innerHTML='';makeChips().forEach(c=>tc.appendChild(c));}
+  const dtc=document.getElementById('drawerTagCloud');
+  if(dtc){dtc.innerHTML='';makeChips(closeDrawer).forEach(c=>dtc.appendChild(c));}
+}
+function filterTag(t){activeTag=activeTag===t?null:t;renderCards();}
+
+// ═══ RENDER CARDS ════════════════════════════════════════
 function getFiltered(){
   const q=document.getElementById('searchInput').value.toLowerCase();
   const sort=document.querySelector('.sort-sel').value;
@@ -1064,68 +722,9 @@ function getFiltered(){
   return list;
 }
 
-function renderModelUI(){
-  const sidebar = document.getElementById('sidebarModels');
-  const drawer = document.getElementById('drawerModels');
-  const drawerTags = document.getElementById('drawerTagCloud');
-  const fModel = document.getElementById('fModel');
-  const models = allModels();
-
-  const modelItemsHTML = (cls, itemCls) =>
-    `<div class="${itemCls}${activeModel==='all'?' active':''}" data-model="all" onclick="selModel('all')" style="${activeModel==='all'?'border-left-color:var(--text2)':''}">
-      <div class="dot dot-all"></div>すべて<span class="${cls}-count">${prompts.length}</span></div>` +
-    models.map(m=>{
-      const cnt = prompts.filter(p=>p.model===m.id).length;
-      const isActive = activeModel===m.id;
-      return `<div class="${itemCls}${isActive?' active':''}" data-model="${m.id}" onclick="selModel('${m.id}')" style="${isActive?'border-left-color:'+m.color+';color:'+m.color:''}">
-        <div class="dot" style="background:${m.color}"></div>${esc(m.label)}<span class="${cls}-count">${cnt}</span></div>`;
-    }).join('') +
-    `<div class="${itemCls}" onclick="openAddModel()" style="color:var(--text3);font-size:12px;">
-      <div class="dot" style="border:1.5px dashed var(--text3);border-radius:50%;"></div>＋ モデルを追加</div>`;
-
-  // サイドバー（PC）
-  if(sidebar){
-    sidebar.innerHTML = modelItemsHTML('sb','sb-item');
-  }
-
-  // ドロワー（SP）
-  if(drawer){
-    drawer.innerHTML = modelItemsHTML('drawer','drawer-item');
-    // ドロワー内タグクラウド更新
-    const freq={};
-    prompts.forEach(p=>(p.tags||[]).forEach(t=>{freq[t]=(freq[t]||0)+1;}));
-    if(drawerTags){
-      drawerTags.innerHTML = Object.entries(freq).sort((a,b)=>b[1]-a[1]).map(([t])=>
-        `<button class="tag-chip${activeTag===t?' active':''}" onclick="filterTag('${esc(t)}');closeDrawer()">#${esc(t)}</button>`
-      ).join('') || '<span style="font-size:12px;color:var(--text3);padding:0 4px">タグなし</span>';
-    }
-    // お気に入りフィルターの状態反映
-    const sf = document.getElementById('drawerStarFilter');
-    const sb = document.getElementById('drawerStarBadge');
-    if(sf) sf.style.background = starOnly?'var(--bg3)':'';
-    if(sb) sb.style.display = starOnly?'inline':'none';
-  }
-
-  // フォームのselect
-  if(fModel){
-    const cur = fModel.value;
-    fModel.innerHTML = models.map(m=>`<option value="${m.id}">${esc(m.label)}</option>`).join('');
-    if(cur) fModel.value = cur;
-  }
-}
-
-function updateTags(){
-  const freq={};
-  prompts.forEach(p=>(p.tags||[]).forEach(t=>{freq[t]=(freq[t]||0)+1;}));
-  const html = Object.entries(freq).sort((a,b)=>b[1]-a[1]).map(([t])=>
-    `<button class="tag-chip${activeTag===t?' active':''}" onclick="filterTag('${esc(t)}')">#${esc(t)}</button>`
-  ).join('');
-  const tc = document.getElementById('tagCloud');
-  if(tc) tc.innerHTML = html;
-}
-
 function renderCards(){
-  renderModelUI();updateTags();
+  renderModelUI();
+  updateTags();
   const list=getFiltered();
   const grid=document.getElementById('cardsGrid');
   document.getElementById('cntLbl').textContent=list.length+' 件';
@@ -1133,108 +732,114 @@ function renderCards(){
     grid.innerHTML='<div class="empty"><div class="empty-ico">∅</div><div>プロンプトがありません</div></div>';
     return;
   }
-  grid.innerHTML=list.map(p=>`
-    <div class="card">
+  grid.innerHTML='';
+  list.forEach(p=>{
+    const div=document.createElement('div');
+    div.className='card';
+    // head
+    const headHTML=`
       <div class="card-head">
-        <span class="model-badge ${badgeClass(p.model)}" style="background:${modelColor(p.model)}18;color:${modelColor(p.model)}">${esc(modelLabel(p.model))}</span>
+        <span class="model-badge" style="background:${modelColor(p.model)}18;color:${modelColor(p.model)}">${esc(modelLabel(p.model))}</span>
         ${p.category?`<span style="font-size:10px;color:var(--text3);font-family:var(--mono)">${esc(p.category)}</span>`:''}
         <span class="card-title">${esc(p.title)}</span>
         <div class="card-actions">
-          <button class="ic-btn${p.starred?' starred':''}" onclick="toggleStarCard('${p.id}',event)">${p.starred?'★':'☆'}</button>
-          <button class="ic-btn copy-btn" id="cp-${p.id}" onclick="copyCard('${p.id}',event)">⎘ コピー</button>
-          <button class="ic-btn" onclick="openEdit('${p.id}',event)">✎</button>
+          <button class="ic-btn${p.starred?' starred':''}" data-action="star">★</button>
+          <button class="ic-btn copy-btn" data-action="copy">⎘ コピー</button>
+          <button class="ic-btn" data-action="edit">✎</button>
         </div>
-      </div>
-      <div class="card-body">
-        <div class="card-preview" id="pv-${p.id}" onclick="openDetail('${p.id}')">${esc(p.prompt)}</div>
-      </div>
-      \${p.imageIds&&p.imageIds.length?`<div class="card-images">\${p.imageIds.map((fid,i)=>`<img class="card-img-thumb" src="https://drive.google.com/uc?export=view&id=\${fid}" loading="lazy" onclick="openLightbox('\${p.id}',\${i});event.stopPropagation()" onerror="this.style.display='none'">`).join('')}</div>`:''}
-      <div class="card-foot">
-        <div class="card-tags">${(p.tags||[]).map(t=>`<span class="c-tag" onclick="filterTag('${esc(t)}');event.stopPropagation()">#${esc(t)}</span>`).join('')}</div>
-        ${p.rating?`<div class="stars">${[1,2,3,4,5].map(i=>`<div class="star-d${i<=p.rating?' on':''}"></div>`).join('')}</div>`:''}
-        ${p.sourceUrl?`<a href="${esc(p.sourceUrl)}" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--text3);text-decoration:none;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;" title="${esc(p.sourceTitle||p.sourceUrl)}">⎋ ${esc(p.sourceTitle||'引用元')}</a>`:''}
-        <span class="card-date">${fmtDate(p.createdAt)}</span>
-        <button class="ic-btn" style="font-size:10px" onclick="openDetail('${p.id}')">詳細→</button>
-      </div>
-    </div>
-  `).join('');
+      </div>`;
+    // images
+    let imgsHTML='';
+    if(p.imageIds&&p.imageIds.length){
+      imgsHTML='<div class="card-images">';
+      p.imageIds.forEach((fid,i)=>{
+        imgsHTML+=`<img class="card-img-thumb" src="https://drive.google.com/uc?export=view&id=${esc(fid)}" loading="lazy" data-action="lightbox" data-idx="${i}" onerror="this.style.display='none'">`;
+      });
+      imgsHTML+='</div>';
+    }
+    // foot
+    const tagsHTML=(p.tags||[]).map(t=>`<span class="c-tag" data-tag="${esc(t)}">#${esc(t)}</span>`).join('');
+    const starsHTML=p.rating?`<div class="stars">${[1,2,3,4,5].map(i=>`<div class="star-d${i<=p.rating?' on':''}"></div>`).join('')}</div>`:'';
+    const srcHTML=p.sourceUrl?`<a href="${esc(p.sourceUrl)}" target="_blank" style="font-family:var(--mono);font-size:10px;color:var(--text3);text-decoration:none;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;" title="${esc(p.sourceTitle||p.sourceUrl)}">⎋ ${esc(p.sourceTitle||'引用元')}</a>`:'';
+    div.innerHTML=headHTML+
+      `<div class="card-body"><div class="card-preview" data-action="expand">${esc(p.prompt)}</div></div>`+
+      imgsHTML+
+      `<div class="card-foot"><div class="card-tags">${tagsHTML}</div>${starsHTML}${srcHTML}<span class="card-date">${fmtDate(p.createdAt)}</span><button class="ic-btn" data-action="detail" style="font-size:10px">詳細→</button></div>`;
+    // events
+    div.querySelector('[data-action="star"]').addEventListener('click',function(e){e.stopPropagation();p.starred=!p.starred;p.updatedAt=Date.now();saveLocal();pushToSheets('update',p);renderCards();});
+    div.querySelector('[data-action="copy"]').addEventListener('click',function(e){e.stopPropagation();copyText(p.prompt,this);});
+    div.querySelector('[data-action="edit"]').addEventListener('click',function(e){e.stopPropagation();openEdit(p.id);});
+    div.querySelector('[data-action="expand"]').addEventListener('click',function(){this.classList.toggle('expanded');});
+    div.querySelector('[data-action="detail"]').addEventListener('click',function(){openDetail(p.id);});
+    div.querySelectorAll('.c-tag').forEach(el=>{el.addEventListener('click',function(e){e.stopPropagation();filterTag(this.dataset.tag);});});
+    if(p.imageIds&&p.imageIds.length){
+      div.querySelectorAll('[data-action="lightbox"]').forEach(el=>{
+        el.addEventListener('click',function(e){e.stopPropagation();openLightbox(p.id,parseInt(this.dataset.idx));});
+      });
+    }
+    grid.appendChild(div);
+  });
 }
 
-function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-function fmtDate(ts){const d=new Date(ts);return`${d.getFullYear()}/${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;}
-
-// ═══════════════════════════════════════════════════════
-//  CARD ACTIONS
-// ═══════════════════════════════════════════════════════
-function copyCard(id,e){
-  e&&e.stopPropagation();
-  const p=prompts.find(x=>x.id===id);if(!p)return;
-  navigator.clipboard.writeText(p.prompt).then(()=>{
-    const btn=document.getElementById('cp-'+id);
-    if(btn){btn.textContent='✓ コピー済';btn.classList.add('copied');setTimeout(()=>{btn.textContent='⎘ コピー';btn.classList.remove('copied');},1800);}
+// ═══ COPY ════════════════════════════════════════════════
+function copyText(text,btn){
+  navigator.clipboard.writeText(text).then(()=>{
+    if(btn){const orig=btn.textContent;btn.textContent='✓ コピー済';btn.classList.add('copied');setTimeout(()=>{btn.textContent=orig;btn.classList.remove('copied');},1800);}
     toast('コピーしました');
   });
 }
 function copyFromDetail(){
-  const p=prompts.find(x=>x.id===detailId);if(!p)return;
-  navigator.clipboard.writeText(p.prompt).then(()=>toast('コピーしました'));
-}
-function toggleStarCard(id,e){
-  e&&e.stopPropagation();
-  const p=prompts.find(x=>x.id===id);if(!p)return;
-  p.starred=!p.starred;p.updatedAt=Date.now();
-  saveLocal();pushToSheets('update',p);renderCards();
+  const p=prompts.find(x=>x.id===detailId);
+  if(p)navigator.clipboard.writeText(p.prompt).then(()=>toast('コピーしました'));
 }
 
-// ═══════════════════════════════════════════════════════
-//  DETAIL
-// ═══════════════════════════════════════════════════════
+// ═══ DETAIL ══════════════════════════════════════════════
 function openDetail(id){
   detailId=id;
   const p=prompts.find(x=>x.id===id);if(!p)return;
   document.getElementById('dtTitle').textContent=p.title;
   document.getElementById('dtPrompt').textContent=p.prompt;
-  document.getElementById('dtMeta').innerHTML=`
-    <div class="d-meta">モデル <span class="model-badge" style="display:inline;background:${modelColor(p.model)}18;color:${modelColor(p.model)}">${esc(modelLabel(p.model))}</span></div>
-    ${p.category?`<div class="d-meta">カテゴリ <span>${esc(p.category)}</span></div>`:''}
-    ${p.rating?`<div class="d-meta">評価 <span>${'★'.repeat(p.rating)}</span></div>`:''}
-    <div class="d-meta">登録 <span>${fmtDate(p.createdAt)}</span></div>
-    ${p.sourceUrl?`<div class="d-meta" style="width:100%">引用元 <a href="${esc(p.sourceUrl)}" target="_blank" style="color:var(--gemini);font-family:var(--mono);font-size:11px;">${esc(p.sourceTitle||p.sourceUrl)}</a></div>`:''}
-  `;
+  document.getElementById('dtMeta').innerHTML=
+    `<div class="d-meta">モデル <span style="display:inline;padding:2px 6px;border-radius:4px;background:${modelColor(p.model)}18;color:${modelColor(p.model)};font-family:var(--mono);font-size:10px">${esc(modelLabel(p.model))}</span></div>`+
+    (p.category?`<div class="d-meta">カテゴリ <span>${esc(p.category)}</span></div>`:'')+
+    (p.rating?`<div class="d-meta">評価 <span>${'★'.repeat(p.rating)}</span></div>`:'')+
+    `<div class="d-meta">登録 <span>${fmtDate(p.createdAt)}</span></div>`+
+    (p.sourceUrl?`<div class="d-meta" style="width:100%">引用元 <a href="${esc(p.sourceUrl)}" target="_blank" style="color:var(--gemini);font-family:var(--mono);font-size:11px">${esc(p.sourceTitle||p.sourceUrl)}</a></div>`:'');
   const nw=document.getElementById('dtNoteWrap');
-  if(p.note){nw.style.display='block';document.getElementById('dtNote').textContent=p.note;}
-  else nw.style.display='none';
+  if(p.note){nw.style.display='block';document.getElementById('dtNote').textContent=p.note;}else nw.style.display='none';
   const iw=document.getElementById('dtImagesWrap');
   const ig=document.getElementById('dtImages');
   if(p.imageIds&&p.imageIds.length){
     iw.style.display='block';
-    ig.innerHTML=p.imageIds.map((fid,i)=>`
-      <div class="img-thumb">
-        <img src="https://drive.google.com/uc?export=view&id=${fid}" loading="lazy"
-          onclick="openLightbox('${p.id}',${i})" onerror="this.parentNode.style.display='none'">
-      </div>`).join('');
+    ig.innerHTML='';
+    p.imageIds.forEach((fid,i)=>{
+      const wrap=document.createElement('div');wrap.className='img-thumb';
+      const img=document.createElement('img');
+      img.src='https://drive.google.com/uc?export=view&id='+fid;
+      img.loading='lazy';
+      img.addEventListener('click',function(){openLightbox(id,i);});
+      img.addEventListener('error',function(){wrap.style.display='none';});
+      wrap.appendChild(img);ig.appendChild(wrap);
+    });
   }else iw.style.display='none';
   document.getElementById('detailOverlay').classList.add('open');
 }
 function editFromDetail(){closeModal('detailOverlay');openEdit(detailId);}
 
-// ═══════════════════════════════════════════════════════
-//  ADD / EDIT
-// ═══════════════════════════════════════════════════════
+// ═══ ADD / EDIT ══════════════════════════════════════════
 function openAdd(){
   editId=null;
   document.getElementById('editTitle').textContent='プロンプトを追加';
   document.getElementById('delBtn').style.display='none';
   ['fTitle','fPrompt','fTags','fCat','fNote','fSourceUrl','fSourceTitle'].forEach(id=>document.getElementById(id).value='');
-  editImages=[];renderImgPreview();
-  const defaultModel=activeModel!=='all'?activeModel:(allModels()[0]||{id:'claude'}).id;
-  document.getElementById('fModel').value=defaultModel;
+  const fm=document.getElementById('fModel');
+  fm.value=activeModel!=='all'?activeModel:(allModels()[0]||{id:'claude'}).id;
   document.getElementById('fRating').value='0';
+  editImages=[];renderImgPreview();
   document.getElementById('editOverlay').classList.add('open');
   setTimeout(()=>document.getElementById('fTitle').focus(),200);
 }
-function openEdit(id,e){
-  e&&e.stopPropagation();
+function openEdit(id){
   editId=id;
   const p=prompts.find(x=>x.id===id);if(!p)return;
   document.getElementById('editTitle').textContent='プロンプトを編集';
@@ -1284,13 +889,89 @@ function delPrompt(){
   if(!confirm('このプロンプトを削除しますか？'))return;
   const p=prompts.find(x=>x.id===editId);
   prompts=prompts.filter(x=>x.id!==editId);
-  saveLocal();if(p)pushToSheets('delete',{id:p.id});
+  saveLocal();
+  if(p)pushToSheets('delete',{id:p.id});
   closeModal('editOverlay');renderCards();toast('削除しました');
 }
 
-// ═══════════════════════════════════════════════════════
-//  SETUP
-// ═══════════════════════════════════════════════════════
+// ═══ IMAGE ═══════════════════════════════════════════════
+function renderImgPreview(){
+  const grid=document.getElementById('imgPreviewGrid');if(!grid)return;
+  grid.innerHTML='';
+  editImages.forEach((img,i)=>{
+    const wrap=document.createElement('div');wrap.className='img-thumb';
+    if(img.url){const im=document.createElement('img');im.src=img.url;wrap.appendChild(im);}
+    if(img.uploading){const ld=document.createElement('div');ld.className='img-uploading';ld.textContent='↑';wrap.appendChild(ld);}
+    else{const btn=document.createElement('button');btn.className='img-thumb-del';btn.textContent='×';btn.addEventListener('click',function(){removeImg(i);});wrap.appendChild(btn);}
+    grid.appendChild(wrap);
+  });
+  document.getElementById('imgUploadArea').style.display=editImages.length>=MAX_IMAGES?'none':'block';
+}
+async function handleImageFiles(e){
+  const files=Array.from(e.target.files);e.target.value='';
+  for(const f of files){
+    if(editImages.length>=MAX_IMAGES){toast('画像は最大'+MAX_IMAGES+'枚です');break;}
+    if(f.size>MAX_SIZE){toast(f.name+' はサイズ超過（5MB以下）');continue;}
+    await uploadImageFile(f);
+  }
+}
+async function dropImage(e){
+  e.preventDefault();
+  document.getElementById('imgUploadArea').classList.remove('drag');
+  const files=Array.from(e.dataTransfer.files).filter(f=>f.type.startsWith('image/'));
+  for(const f of files){
+    if(editImages.length>=MAX_IMAGES){toast('画像は最大'+MAX_IMAGES+'枚です');break;}
+    if(f.size>MAX_SIZE){toast(f.name+' はサイズ超過（5MB以下）');continue;}
+    await uploadImageFile(f);
+  }
+}
+async function uploadImageFile(file){
+  if(!gasUrl){toast('先にGAS URLを設定してください');return;}
+  const localUrl=URL.createObjectURL(file);
+  const idx=editImages.length;
+  editImages.push({fileId:'',url:localUrl,uploading:true});
+  renderImgPreview();
+  try{
+    const base64=await fileToBase64(file);
+    const res=await fetch(gasUrl,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify({action:'uploadImage',payload:{base64,mimeType:file.type,fileName:file.name}})});
+    // no-corsではレスポンス読めないため同期で確認
+    toast('アップロード送信済み（同期後に確認してください）');
+    editImages[idx]={fileId:'pending_'+Date.now(),url:localUrl,uploading:false};
+  }catch(e){
+    editImages.splice(idx,1);
+    toast('アップロードエラー: '+e.message);
+  }
+  renderImgPreview();
+}
+function fileToBase64(file){
+  return new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(file);});
+}
+async function removeImg(i){
+  const img=editImages[i];
+  if(img&&img.fileId&&!img.fileId.startsWith('pending_')&&gasUrl){
+    gasPost({action:'deleteImage',payload:{fileId:img.fileId}});
+  }
+  editImages.splice(i,1);renderImgPreview();
+}
+
+// ═══ LIGHTBOX ════════════════════════════════════════════
+function openLightbox(promptId,startIdx){
+  const p=prompts.find(x=>x.id===promptId);
+  if(!p||!p.imageIds||!p.imageIds.length)return;
+  lbImages=p.imageIds.map(fid=>'https://drive.google.com/uc?export=view&id='+fid);
+  lbIndex=startIdx||0;showLbImage();
+  document.getElementById('lightbox').classList.add('open');
+}
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');}
+function lbNav(dir){lbIndex=(lbIndex+dir+lbImages.length)%lbImages.length;showLbImage();}
+function showLbImage(){
+  document.getElementById('lightboxImg').src=lbImages[lbIndex];
+  document.getElementById('lbCounter').textContent=lbImages.length>1?(lbIndex+1)+' / '+lbImages.length:'';
+  document.getElementById('lbPrev').style.display=lbImages.length>1?'flex':'none';
+  document.getElementById('lbNext').style.display=lbImages.length>1?'flex':'none';
+}
+
+// ═══ SETUP ═══════════════════════════════════════════════
 function openSetup(){
   document.getElementById('gasUrlInput').value=gasUrl;
   document.getElementById('setupTestResult').style.display='none';
@@ -1316,16 +997,14 @@ async function saveSetup(){
   await syncFromSheets();
 }
 
-// ═══════════════════════════════════════════════════════
-//  IMPORT / EXPORT
-// ═══════════════════════════════════════════════════════
+// ═══ IMPORT / EXPORT ═════════════════════════════════════
 function exportJSON(){
   const blob=new Blob([JSON.stringify(prompts,null,2)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);
   a.download='prompts_'+new Date().toISOString().slice(0,10)+'.json';a.click();
   toast('エクスポートしました');
 }
-function importJSON(e){
+async function importJSON(e){
   const f=e.target.files[0];if(!f)return;
   const r=new FileReader();
   r.onload=async ev=>{
@@ -1337,12 +1016,8 @@ function importJSON(e){
       saveLocal();
       if(gasUrl&&added>0){
         setSyncStatus('loading','Sheetsに書き込み中…');
-        try{
-          await gasPost({action:'bulkAdd',payload:data});
-          setSyncStatus('ok','インポート完了');
-        }catch(e){
-          setSyncStatus('err','ローカル保存済み・Sheets同期失敗');
-        }
+        try{await gasPost({action:'bulkAdd',payload:data});setSyncStatus('ok','同期完了');}
+        catch{setSyncStatus('err','ローカル保存済み・Sheets同期失敗');}
       }
       renderCards();toast(added+' 件をインポートしました');
     }catch{toast('JSONの形式が正しくありません');}
@@ -1350,12 +1025,23 @@ function importJSON(e){
   r.readAsText(f);e.target.value='';
 }
 
-// ═══════════════════════════════════════════════════════
-//  MODAL HELPERS
-// ═══════════════════════════════════════════════════════
-// ═══════════════════════════════════════════════════════
-//  ADD CUSTOM MODEL
-// ═══════════════════════════════════════════════════════
+// ═══ PAGE TITLE FETCH ════════════════════════════════════
+async function fetchPageTitle(){
+  if(!gasUrl){toast('先にGAS URLを設定してください');return;}
+  const url=document.getElementById('fSourceUrl').value.trim();
+  if(!url){toast('URLを入力してください');return;}
+  const btn=document.getElementById('fetchTitleBtn');
+  btn.textContent='取得中…';btn.disabled=true;
+  try{
+    const r=await fetch(gasUrl+'?action=fetchTitle&url='+encodeURIComponent(url));
+    const d=await r.json();
+    if(d.ok&&d.title){document.getElementById('fSourceTitle').value=d.title;toast('タイトルを取得しました');}
+    else toast('取得失敗: '+(d.error||'不明'));
+  }catch(e){toast('通信エラー: '+e.message);}
+  finally{btn.textContent='タイトル取得';btn.disabled=false;}
+}
+
+// ═══ CUSTOM MODEL ════════════════════════════════════════
 function openAddModel(){
   document.getElementById('newModelName').value='';
   document.getElementById('newModelColor').value='#888888';
@@ -1370,61 +1056,18 @@ function saveCustomModel(){
   if(allModels().find(m=>m.id===id)){toast('同名のモデルが既に存在します');return;}
   customModels.push({id,label,color});
   localStorage.setItem(LS_MODELS,JSON.stringify(customModels));
-  closeModal('addModelOverlay');
-  renderModelUI();
+  closeModal('addModelOverlay');renderModelUI();
   toast(label+' を追加しました');
 }
-// ═══════════════════════════════════════════════════════
-//  DRAWER
-// ═══════════════════════════════════════════════════════
-function openDrawer(){
-  const drawer = document.getElementById('drawer');
-  const overlay = document.getElementById('drawerOverlay');
-  if(!drawer||!overlay)return;
-  // SPのみ動作
-  if(window.innerWidth>640)return;
-  drawer.style.display='flex';
-  overlay.style.display='block';
-  // 次フレームでアニメーション開始
-  requestAnimationFrame(()=>{
-    drawer.classList.add('open');
-    overlay.classList.add('open');
-  });
-  document.body.style.overflow='hidden';
-}
-function closeDrawer(){
-  const drawer = document.getElementById('drawer');
-  const overlay = document.getElementById('drawerOverlay');
-  if(!drawer||!overlay)return;
-  drawer.classList.remove('open');
-  overlay.classList.remove('open');
-  document.body.style.overflow='';
-  // アニメーション後にhide
-  setTimeout(()=>{
-    if(!drawer.classList.contains('open')){
-      drawer.style.display='none';
-      overlay.style.display='none';
-    }
-  },260);
-}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
-function bgClose(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 
-// ═══════════════════════════════════════════════════════
-//  TOAST
-// ═══════════════════════════════════════════════════════
+// ═══ MODAL ═══════════════════════════════════════════════
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+
+// ═══ TOAST ═══════════════════════════════════════════════
 function toast(msg){
   const el=document.getElementById('toast');el.textContent=msg;el.classList.add('show');
   clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove('show'),2200);
 }
-
-// ═══════════════════════════════════════════════════════
-//  KEYBOARD
-// ═══════════════════════════════════════════════════════
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){['editOverlay','detailOverlay','setupOverlay'].forEach(id=>closeModal(id));closeDrawer();closeLightbox();}
-  if((e.metaKey||e.ctrlKey)&&e.key==='k'){e.preventDefault();document.getElementById('searchInput').focus();}
-});
 
 init();
 </script>
